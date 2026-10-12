@@ -254,9 +254,11 @@ async fn run_monitor(cli: Cli) -> Result<()> {
     let remove_command_queue: Option<crate::api::RemoveCommandQueue>;
 
     if let Some(port) = cli.api_port {
-        let shared = std::sync::Arc::new(std::sync::RwLock::new(crate::api::ApiSnapshot::default()));
+        let shared =
+            std::sync::Arc::new(std::sync::RwLock::new(crate::api::ApiSnapshot::default()));
         let cmds: crate::api::CommandQueue = std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
-        let removes: crate::api::RemoveCommandQueue = std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
+        let removes: crate::api::RemoveCommandQueue =
+            std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
         let shared_clone = shared.clone();
         let cmds_clone = cmds.clone();
         let removes_clone = removes.clone();
@@ -303,6 +305,7 @@ async fn run_monitor(cli: Cli) -> Result<()> {
     Ok(())
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn run_app<B: Backend>(
     terminal: &mut Terminal<B>,
     app: &mut App,

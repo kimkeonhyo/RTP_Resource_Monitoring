@@ -291,7 +291,12 @@ pub async fn serve(
         .allow_headers(Any)
         .allow_origin(Any);
 
-    let server_state = ApiServerState { snapshot: state, commands, remove_commands, dynamic_slack };
+    let server_state = ApiServerState {
+        snapshot: state,
+        commands,
+        remove_commands,
+        dynamic_slack,
+    };
 
     let router = Router::new()
         .route("/api/info", get(get_info_h))

@@ -265,8 +265,14 @@ struct AuthCtx {
 impl AuthCtx {
     /// Build the `Authorization: Digest …\r\n` line for a request.
     fn authorization(&self, method: &str, uri: &str) -> String {
-        let auth =
-            compute_digest_auth(&self.username, &self.password, &self.realm, &self.nonce, method, uri);
+        let auth = compute_digest_auth(
+            &self.username,
+            &self.password,
+            &self.realm,
+            &self.nonce,
+            method,
+            uri,
+        );
         format!("Authorization: {}\r\n", auth)
     }
 }
@@ -603,7 +609,7 @@ async fn rtsp_probe(stream_id: usize, url: &str, prev_uptime: u64) -> MetricsSna
                                         return make_dead(
                                             stream_id,
                                             t0.elapsed().as_secs_f64() * 1000.0,
-                                        )
+                                        );
                                     }
                                 };
                                 match timeout(Duration::from_secs(2), async {
@@ -620,7 +626,7 @@ async fn rtsp_probe(stream_id: usize, url: &str, prev_uptime: u64) -> MetricsSna
                                         return make_dead(
                                             stream_id,
                                             t0.elapsed().as_secs_f64() * 1000.0,
-                                        )
+                                        );
                                     }
                                 }
                             }

@@ -1,9 +1,9 @@
 use crate::alert::{AlertConfig, AlertEngine, SharedSlackWebhook, spawn_alert_dispatcher};
+use crate::api::{SharedApiState, aggregate_to_api, stats_view_to_api, stream_to_api};
 use crate::batch::{BatchReceiver, RtpEndpoint, SharedMetricsMap};
 #[cfg(feature = "pcap-capture")]
 use crate::capture::{CaptureMonitor, SharedCaptureMetrics, StreamEndpoint};
 use crate::monitor::{MonitorHandle, StreamMonitor};
-use crate::api::{SharedApiState, aggregate_to_api, stats_view_to_api, stream_to_api};
 use crate::stats::{
     DownSummary, EventLogEntry, StatsFilter, StatsSnapshot, StatsStore, StatsTrend,
     StreamEventCounts, connection_event_kind,
@@ -822,7 +822,7 @@ impl App {
     pub fn remove_stream_by_id(&mut self, id: usize) {
         if let Some(pos) = self.streams.iter().position(|s| s.id == id) {
             let name = self.streams[pos].name.clone();
-            let url  = self.streams[pos].url.clone();
+            let url = self.streams[pos].url.clone();
             self.streams.remove(pos);
             self.monitors.retain(|m| m.stream_id != id);
             // Clean up polled tracking so the poller doesn't try to remove
@@ -857,10 +857,8 @@ impl App {
         if let Some(stream) = self.streams.iter_mut().find(|s| s.url == url) {
             let old_name = std::mem::replace(&mut stream.name, new_name.to_string());
             if old_name != new_name {
-                self.logs.push_back(format!(
-                    "Poller: renamed '{}' → '{}'",
-                    old_name, new_name
-                ));
+                self.logs
+                    .push_back(format!("Poller: renamed '{}' → '{}'", old_name, new_name));
                 if self.logs.len() > 500 {
                     self.logs.pop_front();
                 }
@@ -884,7 +882,9 @@ impl App {
             if self.selected >= self.streams.len() && self.selected > 0 {
                 self.selected -= 1;
             }
-            self.log(format!("Poller: removed stream '{name}' (no longer in API)"));
+            self.log(format!(
+                "Poller: removed stream '{name}' (no longer in API)"
+            ));
             self.refresh_stats_view();
         }
     }
@@ -892,8 +892,8 @@ impl App {
     pub fn delete_selected_stream(&mut self) {
         if !self.streams.is_empty() {
             let name = self.streams[self.selected].name.clone();
-            let url  = self.streams[self.selected].url.clone();
-            let id   = self.streams[self.selected].id;
+            let url = self.streams[self.selected].url.clone();
+            let id = self.streams[self.selected].id;
             self.streams.remove(self.selected);
             self.monitors.retain(|m| m.stream_id != id);
             self.polled_urls.remove(&url);
@@ -1264,10 +1264,8 @@ impl App {
     }
 
     fn build_stats_rows(&self, counts: Vec<StreamEventCounts>) -> Vec<StatsRow> {
-        let counts_by_stream: HashMap<usize, StreamEventCounts> = counts
-            .into_iter()
-            .map(|c| (c.stream_id, c))
-            .collect();
+        let counts_by_stream: HashMap<usize, StreamEventCounts> =
+            counts.into_iter().map(|c| (c.stream_id, c)).collect();
 
         let mut rows: Vec<StatsRow> = self
             .streams

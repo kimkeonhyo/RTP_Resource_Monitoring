@@ -309,10 +309,7 @@ pub fn spawn_alert_dispatcher(
             }
 
             // Send to the runtime-configured Slack webhook (from web UI)
-            let dynamic_url: Option<String> = dynamic_slack
-                .read()
-                .ok()
-                .and_then(|g| g.clone());
+            let dynamic_url: Option<String> = dynamic_slack.read().ok().and_then(|g| g.clone());
             if let Some(webhook_url) = dynamic_url {
                 let dynamic = SlackConfig {
                     webhook_url,

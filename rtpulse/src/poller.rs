@@ -87,7 +87,7 @@ pub fn spawn_poller(
                 Ok(resp) if resp.status().is_success() => {
                     match resp.json::<Vec<ApiStream>>().await {
                         Ok(current) => {
-                            let added   = diff_added(&last_state, &current);
+                            let added = diff_added(&last_state, &current);
                             let removed = diff_removed(&last_state, &current);
                             let renamed = diff_renamed(&last_state, &current);
 
@@ -132,8 +132,7 @@ pub fn spawn_poller(
 
 /// Returns streams present in `current` but absent from `last` (by URL).
 fn diff_added(last: &[ApiStream], current: &[ApiStream]) -> Vec<PollAdd> {
-    let last_urls: std::collections::HashSet<&str> =
-        last.iter().map(|s| s.url.as_str()).collect();
+    let last_urls: std::collections::HashSet<&str> = last.iter().map(|s| s.url.as_str()).collect();
 
     current
         .iter()
@@ -158,8 +157,10 @@ fn diff_removed(last: &[ApiStream], current: &[ApiStream]) -> Vec<String> {
 
 /// Returns streams present in both `last` and `current` (same URL) but whose name changed.
 fn diff_renamed(last: &[ApiStream], current: &[ApiStream]) -> Vec<PollRename> {
-    let last_by_url: std::collections::HashMap<&str, &str> =
-        last.iter().map(|s| (s.url.as_str(), s.name.as_str())).collect();
+    let last_by_url: std::collections::HashMap<&str, &str> = last
+        .iter()
+        .map(|s| (s.url.as_str(), s.name.as_str()))
+        .collect();
 
     current
         .iter()

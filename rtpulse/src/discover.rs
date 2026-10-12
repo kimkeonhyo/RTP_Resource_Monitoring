@@ -262,8 +262,7 @@ impl Discoverer {
         println!("  [RTSP] Discovered: {}", url);
 
         // Build a unique name from IP + path segments (e.g. "192.0.2.10-c6-s1-live")
-        let cleaned = url
-            .trim_start_matches("rtsp://");
+        let cleaned = url.trim_start_matches("rtsp://");
         let name = if let Some(host) = cleaned.split('/').next() {
             let ip = host.split(':').next().unwrap_or(host);
             // Strip credentials (user:pass@) from IP

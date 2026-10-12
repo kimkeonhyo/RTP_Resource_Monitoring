@@ -642,10 +642,7 @@ fn draw_stats(f: &mut Frame, app: &App, area: Rect) {
                     .add_modifier(Modifier::BOLD),
             ))
         } else {
-            Line::from(Span::styled(
-                label,
-                Style::default().fg(C_ACCENT),
-            ))
+            Line::from(Span::styled(label, Style::default().fg(C_ACCENT)))
         }
     })
     .collect();
@@ -718,7 +715,11 @@ fn draw_stats(f: &mut Frame, app: &App, area: Rect) {
         card_chunks[2],
     );
     f.render_widget(
-        metric_card("Last Event", &format_last_down(last_event_epoch), Color::White),
+        metric_card(
+            "Last Event",
+            &format_last_down(last_event_epoch),
+            Color::White,
+        ),
         card_chunks[3],
     );
 
@@ -784,13 +785,25 @@ fn draw_stats_table(
             Row::new(vec![
                 Cell::from(row.stream_name.as_str()),
                 Cell::from(row.down_count.to_string()).style(Style::default().fg(
-                    if row.down_count > 0 { C_DOWN } else { Color::White },
+                    if row.down_count > 0 {
+                        C_DOWN
+                    } else {
+                        Color::White
+                    },
                 )),
                 Cell::from(row.warn_count.to_string()).style(Style::default().fg(
-                    if row.warn_count > 0 { C_DEGRADED } else { Color::White },
+                    if row.warn_count > 0 {
+                        C_DEGRADED
+                    } else {
+                        Color::White
+                    },
                 )),
                 Cell::from(row.reconnect_count.to_string()).style(Style::default().fg(
-                    if row.reconnect_count > 0 { C_HEALTHY } else { Color::White },
+                    if row.reconnect_count > 0 {
+                        C_HEALTHY
+                    } else {
+                        Color::White
+                    },
                 )),
                 Cell::from(format_last_down(row.last_event_epoch)),
             ])
@@ -848,7 +861,10 @@ fn draw_event_log(f: &mut Frame, app: &App, area: Rect) {
                 ListItem::new(Line::from(vec![
                     Span::styled(format!("{timestamp}  "), Style::default().fg(C_DIM)),
                     Span::styled(format!("{name}  "), Style::default().fg(Color::White)),
-                    Span::styled(kind_label, Style::default().fg(kind_color).add_modifier(Modifier::BOLD)),
+                    Span::styled(
+                        kind_label,
+                        Style::default().fg(kind_color).add_modifier(Modifier::BOLD),
+                    ),
                     Span::styled(format!("  {}", entry.cause()), Style::default().fg(C_DIM)),
                 ]))
             })

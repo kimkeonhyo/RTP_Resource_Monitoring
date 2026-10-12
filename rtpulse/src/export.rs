@@ -67,11 +67,7 @@ fn center_fmt() -> Format {
 // Sheet 1: Summary
 // ---------------------------------------------------------------------------
 
-fn write_summary_sheet(
-    wb: &mut Workbook,
-    view: &StatsView,
-    streams: &[StreamEntry],
-) -> Result<()> {
+fn write_summary_sheet(wb: &mut Workbook, view: &StatsView, streams: &[StreamEntry]) -> Result<()> {
     let ws = wb.add_worksheet();
     ws.set_name("Summary")?;
     ws.set_column_width(0, 24)?;
@@ -85,11 +81,17 @@ fn write_summary_sheet(
 
     let now = Local::now();
     let rows: &[(&str, String)] = &[
-        ("Export Generated", now.format("%Y-%m-%d %H:%M:%S").to_string()),
+        (
+            "Export Generated",
+            now.format("%Y-%m-%d %H:%M:%S").to_string(),
+        ),
         ("Total Streams", streams.len().to_string()),
         ("Downs Today", view.summary.downs_today.to_string()),
         ("Downs Last 7 Days", view.summary.downs_last_7d.to_string()),
-        ("Downs Last 30 Days", view.summary.downs_last_30d.to_string()),
+        (
+            "Downs Last 30 Days",
+            view.summary.downs_last_30d.to_string(),
+        ),
         (
             "Last Down At",
             view.summary
@@ -137,10 +139,8 @@ fn write_stream_stats_sheet(
     ws.write_with_format(0, 5, "Last Event", &h)?;
 
     // Build id→url map for URL lookup
-    let url_map: std::collections::HashMap<usize, &str> = streams
-        .iter()
-        .map(|s| (s.id, s.url.as_str()))
-        .collect();
+    let url_map: std::collections::HashMap<usize, &str> =
+        streams.iter().map(|s| (s.id, s.url.as_str())).collect();
 
     for (i, row) in rows.iter().enumerate() {
         let r = (i + 1) as u32;

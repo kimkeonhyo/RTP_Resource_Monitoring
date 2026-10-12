@@ -465,9 +465,7 @@ pub fn connection_event_kind(from: StreamHealth, to: StreamHealth) -> Option<Con
             Some(ConnectionEventKind::Reconnect)
         }
         // Anything → Down: down
-        (prev, StreamHealth::Down) if prev != StreamHealth::Down => {
-            Some(ConnectionEventKind::Down)
-        }
+        (prev, StreamHealth::Down) if prev != StreamHealth::Down => Some(ConnectionEventKind::Down),
         // Anything → Degraded (not from Down, handled above): warning
         (prev, StreamHealth::Degraded) if prev != StreamHealth::Degraded => {
             Some(ConnectionEventKind::Warning)
@@ -503,10 +501,10 @@ pub fn start_of_day_days_ago_epoch(now: DateTime<Local>, days_ago: i64) -> Resul
 fn build_hourly_trend(now: DateTime<Local>, epochs: &[i64]) -> StatsTrend {
     let mut values = vec![0u64; 24];
     for &epoch in epochs {
-        if let Some(local) = local_datetime(epoch) {
-            if local.date_naive() == now.date_naive() {
-                values[local.hour() as usize] += 1;
-            }
+        if let Some(local) = local_datetime(epoch)
+            && local.date_naive() == now.date_naive()
+        {
+            values[local.hour() as usize] += 1;
         }
     }
     StatsTrend { values }
