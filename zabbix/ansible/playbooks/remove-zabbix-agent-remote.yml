@@ -1,0 +1,66 @@
+---
+# 고객사 사이트에서 Zabbix 에이전트를 걷어낸다.
+# 관제를 Prometheus/Grafana 로 일원화하기로 해서, 고객사 장비에 쓰지 않는 소프트웨어를 남기지 않는다.
+#
+#   ansible-playbook playbooks/remove-zabbix-agent-remote.yml --limit site-b --ask-vault-pass
+#   ansible-playbook playbooks/remove-zabbix-agent-remote.yml --ask-vault-pass
+- name: Remove Zabbix agent (remote customer sites)
+  hosts: remote_site
+  become: true
+  serial: 1
+  max_fail_percentage: 0
+  tasks:
+    - name: 설치 여부 확인
+      ansible.builtin.command: dpkg-query -W -f='${Status}' zabbix-agent2
+      register: pkg
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: 설치되어 있지 않으면 종료
+      when: "'install ok installed' not in pkg.stdout"
+      block:
+        - name: 안내
+          ansible.builtin.debug:
+            msg: "{{ inventory_hostname }} — zabbix-agent2 가 설치되어 있지 않습니다. 건너뜁니다."
+        - name: 이 호스트 종료
+          ansible.builtin.meta: end_host
+
+    - name: 서비스 중지 및 자동 시작 해제
+      ansible.builtin.systemd:
+        name: zabbix-agent2
+        state: stopped
+        enabled: false
+      failed_when: false          # 이미 없거나 죽어 있어도 진행
+
+    - name: 패키지 제거 (설정 파일까지)
+      ansible.builtin.apt:
+        name:
+          - zabbix-agent2
+          - zabbix-release
+        state: absent
+        purge: true
+        autoremove: true
+        lock_timeout: 300
+
+    - name: 남은 설정·로그 정리
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/zabbix
+        - /var/log/zabbix
+        - /var/lib/zabbix
+
+    - name: 제거 확인
+      ansible.builtin.command: dpkg-query -W -f='${Status}' zabbix-agent2
+      register: after
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: 결과
+      ansible.builtin.debug:
+        msg: >-
+          {{ inventory_hostname }} —
+          {{ '제거 완료' if 'install ok installed' not in after.stdout else '제거 실패: ' ~ after.stdout }}

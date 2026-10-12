@@ -1,0 +1,92 @@
+set shell := ["mise", "exec", "--", "bash", "-cu"]
+
+# Default recipe - list available commands
+default:
+    @just --list
+
+# Install all mise-managed tools (rust, pre-commit, etc.)
+setup:
+    mise install
+
+# Build debug version
+build:
+    cargo build
+
+# Build optimized release version
+release:
+    cargo build --release
+
+# Build with pcap capture feature (requires libpcap-dev)
+release-pcap:
+    cargo build --release --features pcap-capture
+
+# Run in demo mode with simulated streams
+demo:
+    cargo run --release -- --demo
+
+# Run with config file in demo mode
+demo-config CONFIG="config.example.yaml":
+    cargo run --release -- --demo -c {{CONFIG}}
+
+# Run in production mode (real network I/O)
+run:
+    cargo run --release
+
+# Run with custom streams (production mode)
+run-streams *STREAMS:
+    cargo run --release -- {{STREAMS}}
+
+# Run with config file (production mode)
+run-config CONFIG="config.example.yaml":
+    cargo run --release -- -c {{CONFIG}}
+
+# Run with custom refresh interval (ms)
+run-interval INTERVAL="500":
+    cargo run --release -- -i {{INTERVAL}}
+
+# Run with pcap capture mode (monitors RTSP+RTP via packet capture)
+capture IFACE CONFIG="config.example.yaml":
+    cargo run --release --features pcap-capture -- -I {{IFACE}} -c {{CONFIG}}
+
+# Discover streams on network (requires libpcap-dev). Usage: just discover eth0
+discover IFACE DURATION="30" OUTPUT="discovered.yaml":
+    cargo run --release --features pcap-capture -- discover -I {{IFACE}} -d {{DURATION}} -o {{OUTPUT}}
+
+# List available network interfaces
+discover-list:
+    cargo run --release --features pcap-capture -- discover --list-interfaces
+
+# Run all tests
+test:
+    cargo test
+
+# Run tests for a specific module
+test-mod MOD:
+    cargo test --lib {{MOD}}
+
+# Run clippy linter
+lint:
+    cargo clippy
+
+# Check formatting
+fmt-check:
+    cargo fmt --check
+
+# Format code
+fmt:
+    cargo fmt
+
+# Run all checks (test, lint, format check)
+check: test lint fmt-check
+
+# Clean build artifacts
+clean:
+    cargo clean
+
+# Watch and run tests on changes (requires cargo-watch)
+watch-test:
+    cargo watch -x test
+
+# Watch and run on changes (requires cargo-watch)
+watch:
+    cargo watch -x 'run --release'

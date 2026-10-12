@@ -1,0 +1,14 @@
+---
+# 고객사 사이트. 사내 장비와 분리해 둔다 — 작업 시점과 승인 절차가 다르고,
+# 실수로 전체 실행할 때 고객사까지 건드리는 것을 막아야 한다.
+#
+# Zabbix(GCP <ZABBIX_SERVER_IP>) → tsr → 테일넷 → 고객사.
+# tsr 이 SNAT 하므로 에이전트에는 tsr 의 테일넷 주소로 도착한다 (<ZABBIX_SERVER_IP> 이 아니다).
+# 사내망이 dev-gpu01 로 SNAT 되는 것과 같은 구조다.
+#
+# tsr VM 이 재생성되면 이 주소가 바뀔 수 있다. 그때는 에이전트 로그에서 다시 확인한다:
+#   grep -i rejected /var/log/zabbix/zabbix_agent2.log
+zabbix_server_allow: "<TSR_TAILNET_IP>"
+
+# 자동 등록 시 사내 장비와 다른 호스트 그룹으로 분류되도록 메타데이터를 구분한다
+zabbix_host_metadata: "linux;remote"

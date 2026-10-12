@@ -1,0 +1,162 @@
+---
+# BMC 에 관리망 static IP 를 설정한다 (서버 안에서 KCS 경로로 처리하므로 SSH 는 끊기지 않는다).
+#
+# 주소는 아래 맵에 박아둔다 — -e 로 받으면 --limit 을 잘못 줬을 때 엉뚱한 장비에 들어간다.
+# DHCP 풀은 <BMC_DHCP_POOL_RANGE> 이므로 그 밖의 주소만 쓴다.
+#
+#   ansible-playbook playbooks/bmc-network-set.yml --limit inf-gpu02 --ask-vault-pass
+- name: Configure BMC management network
+  hosts: ims
+  become: true
+  serial: 1
+  max_fail_percentage: 0
+  vars:
+    bmc_ip_map:
+      inf-gpu02:   <INF_GPU02_BMC_IP>
+      dev-media01: <DEV_MEDIA01_BMC_IP>
+    bmc_netmask: <OFFICE_SUBNET_NETMASK>      # <OFFICE_SUBNET_CIDR> — 더 좁게 주면 서버 대역이 안 보인다
+    bmc_gateway: <OFFICE_GATEWAY_IP>
+  tasks:
+    - name: 이 호스트의 대상 주소 확인
+      ansible.builtin.assert:
+        that: inventory_hostname in bmc_ip_map
+        fail_msg: >-
+          {{ inventory_hostname }} 은 bmc_ip_map 에 없습니다.
+          주소를 정하고 플레이북의 맵에 추가하세요.
+      run_once: false
+
+    - name: 대상 주소 변수화
+      ansible.builtin.set_fact:
+        bmc_ip: "{{ bmc_ip_map[inventory_hostname] }}"
+
+    # IP 가 0.0.0.0 인 채널도 반드시 포함해야 한다 — 전용 포트가 DHCP 실패로
+    # 0.0.0.0 인 상태였고, IP 있는 채널만 보던 이전 스캔이 그걸 놓쳤다.
+    - name: LAN(802.3) 채널 찾기
+      ansible.builtin.shell: |
+        for c in $(seq 1 15); do
+          m=$(ipmitool channel info "$c" 2>/dev/null | awk -F': *' '/Channel Medium Type/{print $2}')
+          case "$m" in *802.3*) echo "$c";; esac
+        done
+        exit 0
+      args:
+        executable: /bin/bash
+      environment:
+        LC_ALL: C
+      register: lan_ch
+      changed_when: false
+      check_mode: false
+
+    - name: LAN 채널이 없으면 중단
+      ansible.builtin.fail:
+        msg: >-
+          {{ inventory_hostname }} — BMC 에 802.3 LAN 채널이 없습니다.
+          이 보드는 원격 IPMI 를 지원하지 않거나 BIOS 에서 꺼져 있습니다.
+      when: lan_ch.stdout_lines | length == 0
+
+    # 이 장비군은 ch8 이 전용 BMC 포트, ch1 은 쓰지 않는 공유 LAN 이다.
+    # 첫 번째 채널을 고르면 ch1 을 잡아 엉뚱한 포트에 IP 를 넣는다(실제로 그랬다).
+    - name: 채널 선택 (전용 포트 우선)
+      ansible.builtin.set_fact:
+        bmc_channel: >-
+          {{ (lan_ch.stdout_lines | map('int') | select('>', 1) | list | sort | first)
+             | default(lan_ch.stdout_lines[0] | int) }}
+
+    - name: 채널 후보 안내
+      ansible.builtin.debug:
+        msg: >-
+          {{ inventory_hostname }} — LAN 채널 후보 {{ lan_ch.stdout_lines | join(', ') }}
+          → ch{{ bmc_channel }} 선택
+
+    - name: 설정 전 현황
+      ansible.builtin.shell: |
+        ipmitool lan print {{ bmc_channel }} 2>/dev/null | grep -E '^(IP Address|Subnet Mask|Default Gateway IP|MAC Address)' || true
+      args:
+        executable: /bin/bash
+      environment:
+        LC_ALL: C
+      register: before
+      changed_when: false
+      check_mode: false
+
+    - name: 현황 출력
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }} — ch{{ bmc_channel }} 변경 전: {{ before.stdout_lines | join(' | ') }} → {{ bmc_ip }}/{{ bmc_netmask }}"
+
+    - name: static 으로 전환 및 주소 설정
+      ansible.builtin.command: "ipmitool lan set {{ bmc_channel }} {{ item }}"
+      loop:
+        - "ipsrc static"
+        - "ipaddr {{ bmc_ip }}"
+        - "netmask {{ bmc_netmask }}"
+        - "defgw ipaddr {{ bmc_gateway }}"
+      changed_when: true
+
+    - name: 반영 확인 (BMC 내부)
+      ansible.builtin.shell: |
+        ipmitool lan print {{ bmc_channel }} 2>/dev/null | grep -E '^(IP Address Source|IP Address|Subnet Mask|Default Gateway IP)' || true
+      args:
+        executable: /bin/bash
+      environment:
+        LC_ALL: C
+      register: after
+      changed_when: false
+      check_mode: false
+
+    # 검증은 컨트롤러에서 한다 — 서버가 자기 BMC 로 붙는 경로는 실제 운영 경로가 아니다.
+    #
+    # wait_for 의 port 검사는 TCP 다. IPMI 는 UDP 623 이라 TCP 로는 아무것도 증명하지 못한다
+    # (실제로 "성공"이 나왔는데 BMC 는 L2 에 존재조차 하지 않았다). ARP 로 먼저 확인한다.
+    - name: BMC 가 이 대역에 존재하는지 (ARP)
+      ansible.builtin.shell: |
+        set -o pipefail
+        # 응답을 유도한 뒤 ARP 캐시를 본다. BMC 는 ICMP 에 답하지 않는 경우가 많아
+        # ping 성공 여부가 아니라 MAC 이 학습됐는지로 판단한다.
+        ping -c 2 -W 1 {{ bmc_ip }} >/dev/null 2>&1 || true
+        arp -n {{ bmc_ip }} 2>/dev/null | grep -qiE '([0-9a-f]{1,2}:){5}' && echo present || echo absent
+      args:
+        executable: /bin/bash
+      delegate_to: localhost
+      become: false
+      register: arp_check
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: 컨트롤러에 ipmitool 이 있는지
+      ansible.builtin.command:
+        argv: [which, ipmitool]
+      delegate_to: localhost
+      become: false
+      register: ctl_ipmi
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: IPMI 로 실제 질의 (자격증명이 있을 때만)
+      ansible.builtin.command:
+        argv: [ipmitool, -I, lanplus, -L, USER, -H, "{{ bmc_ip }}",
+               -U, "{{ bmc_user | default('zbxmon') }}", -P, "{{ bmc_password }}", mc, info]
+      delegate_to: localhost
+      become: false
+      register: ipmi_check
+      changed_when: false
+      failed_when: false
+      no_log: true
+      when:
+        - ctl_ipmi.rc == 0
+        - bmc_password is defined
+        - "'present' in arp_check.stdout"
+
+    - name: 도달 판정
+      ansible.builtin.set_fact:
+        reach_msg: >-
+          {{ 'IPMI 응답 확인' if (ipmi_check.rc | default(1)) == 0
+             else ('L2 에는 있으나 IPMI 응답 없음 — 계정/권한 확인'
+                   if 'present' in arp_check.stdout
+                   else 'ARP 에 없음 — 이 BMC 포트는 다른 대역에 물려 있습니다. 케이블/스위치 포트를 옮겨야 합니다') }}
+
+    - name: 결과
+      ansible.builtin.debug:
+        msg: >-
+          {{ inventory_hostname }} — {{ after.stdout_lines | join(' | ') }}
+          ||  도달: {{ reach_msg }}

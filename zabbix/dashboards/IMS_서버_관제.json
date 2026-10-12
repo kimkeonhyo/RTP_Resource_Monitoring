@@ -1,0 +1,3790 @@
+{
+  "name": "IMS 서버 관제",
+  "display_period": "30",
+  "auto_start": "1",
+  "pages": [
+    {
+      "name": "서버 공통",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "honeycomb",
+          "name": "GPU 사용률 — 전체 29장",
+          "x": "0",
+          "y": "0",
+          "width": "48",
+          "height": "12",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "2",
+              "name": "groupids.0",
+              "value": "IMS 서버·워크스테이션"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{HOST.NAME}}"
+            },
+            {
+              "type": "1",
+              "name": "secondary_label",
+              "value": "{{ITEM.LASTVALUE}}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AAAQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "40"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "70"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "90"
+            }
+          ]
+        },
+        {
+          "type": "problems",
+          "name": "현재 장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "12",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "2",
+              "name": "groupids.0",
+              "value": "IMS 서버·워크스테이션"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "서버 CPU",
+          "x": "0",
+          "y": "12",
+          "width": "24",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "CPU utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AABQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "서버 메모리",
+          "x": "24",
+          "y": "12",
+          "width": "24",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "Memory utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "4E9BE8"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AACQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "GPU 온도 (전체)",
+          "x": "48",
+          "y": "12",
+          "width": "24",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AADQ"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dev-gpu01 (4G)",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "honeycomb",
+          "name": "GPU 사용률 (4장)",
+          "x": "0",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "dev-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AAEQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "40"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "70"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "90"
+            }
+          ]
+        },
+        {
+          "type": "honeycomb",
+          "name": "GPU 온도",
+          "x": "24",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "dev-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AAFQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "60"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "80"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "88"
+            }
+          ]
+        },
+        {
+          "type": "problems",
+          "name": "장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "dev-gpu01"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "GPU 사용률·온도 추이",
+          "x": "0",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AAGQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "VRAM 사용률 / 소비전력",
+          "x": "36",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*VRAM 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*소비전력"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AAHQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "CPU / 메모리 / Load",
+          "x": "0",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "CPU utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "Memory utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "4E9BE8"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.hosts.0",
+              "value": "dev-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.items.0",
+              "value": "Load average (1m avg)"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ABAQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "네트워크 트래픽",
+          "x": "36",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*Bits received*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Bits sent*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ABBQ"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dev-gpu02 (4G)",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "honeycomb",
+          "name": "GPU 사용률 (4장)",
+          "x": "0",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "dev-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ABCQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "40"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "70"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "90"
+            }
+          ]
+        },
+        {
+          "type": "honeycomb",
+          "name": "GPU 온도",
+          "x": "24",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "dev-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ABDQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "60"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "80"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "88"
+            }
+          ]
+        },
+        {
+          "type": "problems",
+          "name": "장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "dev-gpu02"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "GPU 사용률·온도 추이",
+          "x": "0",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ABEQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "VRAM 사용률 / 소비전력",
+          "x": "36",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*VRAM 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*소비전력"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ABFQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "CPU / 메모리 / Load",
+          "x": "0",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "CPU utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "Memory utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "4E9BE8"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.hosts.0",
+              "value": "dev-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.items.0",
+              "value": "Load average (1m avg)"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ABGQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "네트워크 트래픽",
+          "x": "36",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*Bits received*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Bits sent*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ABHQ"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dev-gpu03 (4G)",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "honeycomb",
+          "name": "GPU 사용률 (4장)",
+          "x": "0",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "dev-gpu03"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ACAQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "40"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "70"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "90"
+            }
+          ]
+        },
+        {
+          "type": "honeycomb",
+          "name": "GPU 온도",
+          "x": "24",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "dev-gpu03"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ACBQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "60"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "80"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "88"
+            }
+          ]
+        },
+        {
+          "type": "problems",
+          "name": "장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "dev-gpu03"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "GPU 사용률·온도 추이",
+          "x": "0",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-gpu03"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-gpu03"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ACCQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "VRAM 사용률 / 소비전력",
+          "x": "36",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-gpu03"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*VRAM 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-gpu03"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*소비전력"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ACDQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "CPU / 메모리 / Load",
+          "x": "0",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-gpu03"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "CPU utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-gpu03"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "Memory utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "4E9BE8"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.hosts.0",
+              "value": "dev-gpu03"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.items.0",
+              "value": "Load average (1m avg)"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ACEQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "네트워크 트래픽",
+          "x": "36",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-gpu03"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*Bits received*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-gpu03"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Bits sent*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ACFQ"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dev-gpu04 (3G)",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "honeycomb",
+          "name": "GPU 사용률 (3장)",
+          "x": "0",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "dev-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ACGQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "40"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "70"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "90"
+            }
+          ]
+        },
+        {
+          "type": "honeycomb",
+          "name": "GPU 온도",
+          "x": "24",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "dev-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ACHQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "60"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "80"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "88"
+            }
+          ]
+        },
+        {
+          "type": "problems",
+          "name": "장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "dev-gpu04"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "GPU 사용률·온도 추이",
+          "x": "0",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ADAQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "VRAM 사용률 / 소비전력",
+          "x": "36",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*VRAM 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*소비전력"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ADBQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "CPU / 메모리 / Load",
+          "x": "0",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "CPU utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "Memory utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "4E9BE8"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.hosts.0",
+              "value": "dev-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.items.0",
+              "value": "Load average (1m avg)"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ADCQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "네트워크 트래픽",
+          "x": "36",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*Bits received*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Bits sent*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ADDQ"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ai-gpu02 (2G)",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "honeycomb",
+          "name": "GPU 사용률 (2장)",
+          "x": "0",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "ai-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ADEQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "40"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "70"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "90"
+            }
+          ]
+        },
+        {
+          "type": "honeycomb",
+          "name": "GPU 온도",
+          "x": "24",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "ai-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ADFQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "60"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "80"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "88"
+            }
+          ]
+        },
+        {
+          "type": "problems",
+          "name": "장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "ai-gpu02"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "GPU 사용률·온도 추이",
+          "x": "0",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "ai-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "ai-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ADGQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "VRAM 사용률 / 소비전력",
+          "x": "36",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "ai-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*VRAM 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "ai-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*소비전력"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ADHQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "CPU / 메모리 / Load",
+          "x": "0",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "ai-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "CPU utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "ai-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "Memory utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "4E9BE8"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.hosts.0",
+              "value": "ai-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.items.0",
+              "value": "Load average (1m avg)"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AEAQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "네트워크 트래픽",
+          "x": "36",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "ai-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*Bits received*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "ai-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Bits sent*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AEBQ"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ai-gpu04 (4G)",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "honeycomb",
+          "name": "GPU 사용률 (4장)",
+          "x": "0",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "ai-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AECQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "40"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "70"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "90"
+            }
+          ]
+        },
+        {
+          "type": "honeycomb",
+          "name": "GPU 온도",
+          "x": "24",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "ai-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AEDQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "60"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "80"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "88"
+            }
+          ]
+        },
+        {
+          "type": "problems",
+          "name": "장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "ai-gpu04"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "GPU 사용률·온도 추이",
+          "x": "0",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "ai-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "ai-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AEEQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "VRAM 사용률 / 소비전력",
+          "x": "36",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "ai-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*VRAM 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "ai-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*소비전력"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AEFQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "CPU / 메모리 / Load",
+          "x": "0",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "ai-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "CPU utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "ai-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "Memory utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "4E9BE8"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.hosts.0",
+              "value": "ai-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.items.0",
+              "value": "Load average (1m avg)"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AEGQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "네트워크 트래픽",
+          "x": "36",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "ai-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*Bits received*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "ai-gpu04"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Bits sent*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AEHQ"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "inf-gpu01 (4G)",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "honeycomb",
+          "name": "GPU 사용률 (4장)",
+          "x": "0",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "inf-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AFAQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "40"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "70"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "90"
+            }
+          ]
+        },
+        {
+          "type": "honeycomb",
+          "name": "GPU 온도",
+          "x": "24",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "inf-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AFBQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "60"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "80"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "88"
+            }
+          ]
+        },
+        {
+          "type": "problems",
+          "name": "장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "inf-gpu01"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "GPU 사용률·온도 추이",
+          "x": "0",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "inf-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "inf-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AFCQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "VRAM 사용률 / 소비전력",
+          "x": "36",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "inf-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*VRAM 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "inf-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*소비전력"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AFDQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "CPU / 메모리 / Load",
+          "x": "0",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "inf-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "CPU utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "inf-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "Memory utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "4E9BE8"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.hosts.0",
+              "value": "inf-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.items.0",
+              "value": "Load average (1m avg)"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AFEQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "네트워크 트래픽",
+          "x": "36",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "inf-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*Bits received*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "inf-gpu01"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Bits sent*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AFFQ"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "inf-gpu02 (2G)",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "honeycomb",
+          "name": "GPU 사용률 (2장)",
+          "x": "0",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "inf-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AFGQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "40"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "70"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "90"
+            }
+          ]
+        },
+        {
+          "type": "honeycomb",
+          "name": "GPU 온도",
+          "x": "24",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "inf-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AFHQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "60"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "80"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "88"
+            }
+          ]
+        },
+        {
+          "type": "problems",
+          "name": "장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "inf-gpu02"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "GPU 사용률·온도 추이",
+          "x": "0",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "inf-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "inf-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AGAQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "VRAM 사용률 / 소비전력",
+          "x": "36",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "inf-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*VRAM 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "inf-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*소비전력"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AGBQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "CPU / 메모리 / Load",
+          "x": "0",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "inf-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "CPU utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "inf-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "Memory utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "4E9BE8"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.hosts.0",
+              "value": "inf-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.items.0",
+              "value": "Load average (1m avg)"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AGCQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "네트워크 트래픽",
+          "x": "36",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "inf-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*Bits received*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "inf-gpu02"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Bits sent*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AGDQ"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "WS (07) (2G)",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "honeycomb",
+          "name": "GPU 사용률 (2장)",
+          "x": "0",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "WS-07"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AGEQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "40"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "70"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "90"
+            }
+          ]
+        },
+        {
+          "type": "honeycomb",
+          "name": "GPU 온도",
+          "x": "24",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "WS-07"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"GPU ([0-9]+).*\",\"GPU \\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AGFQ"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "60"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "80"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "88"
+            }
+          ]
+        },
+        {
+          "type": "problems",
+          "name": "장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "WS-07"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "GPU 사용률·온도 추이",
+          "x": "0",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "WS (07)"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*: 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "WS (07)"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*: 온도"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AGGQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "VRAM 사용률 / 소비전력",
+          "x": "36",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "WS (07)"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*VRAM 사용률"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "WS (07)"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*소비전력"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AGHQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "CPU / 메모리 / Load",
+          "x": "0",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "WS (07)"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "CPU utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "WS (07)"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "Memory utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "4E9BE8"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.hosts.0",
+              "value": "WS (07)"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.items.0",
+              "value": "Load average (1m avg)"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AHAQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "네트워크 트래픽",
+          "x": "36",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "WS (07)"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*Bits received*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "WS (07)"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Bits sent*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AHBQ"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dev-storage01",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "problems",
+          "name": "장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "dev-storage01"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "디스크 사용률",
+          "x": "0",
+          "y": "0",
+          "width": "48",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-storage01"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*Space utilization*"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AHCQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "CPU / 메모리 / Load",
+          "x": "0",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-storage01"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "CPU utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-storage01"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "Memory utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "4E9BE8"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.hosts.0",
+              "value": "dev-storage01"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.items.0",
+              "value": "Load average (1m avg)"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AHDQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "네트워크 트래픽",
+          "x": "36",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-storage01"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*Bits received*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-storage01"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Bits sent*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AHEQ"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dev-media01",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "problems",
+          "name": "장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "dev-media01"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "디스크 사용률",
+          "x": "0",
+          "y": "0",
+          "width": "48",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-media01"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*Space utilization*"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AHFQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "CPU / 메모리 / Load",
+          "x": "0",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-media01"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "CPU utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-media01"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "Memory utilization"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "4E9BE8"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.hosts.0",
+              "value": "dev-media01"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.items.0",
+              "value": "Load average (1m avg)"
+            },
+            {
+              "type": "1",
+              "name": "ds.2.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AHGQ"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "네트워크 트래픽",
+          "x": "36",
+          "y": "17",
+          "width": "36",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "dev-media01"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*Bits received*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "dev-media01"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Bits sent*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AHHQ"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

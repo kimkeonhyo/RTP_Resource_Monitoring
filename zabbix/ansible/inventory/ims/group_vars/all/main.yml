@@ -1,0 +1,22 @@
+---
+# Zabbix 서버 주소. PoC 동안은 담당자 Mac(터널 IP), 운영 전환 시 전용 VM 주소로 바꾼다.
+zabbix_server: "<ZABBIX_SERVER_IP>"       # GCP o11y/zabbix VM (demo-infra-o11y-zabbix)
+
+# Zabbix 서버(GCP)에서 오는 트래픽은 tsr → 테일넷 → dev-gpu01 을 거치며
+# 출발지가 서브넷 라우터 주소로 SNAT 된다. 그래서 허용할 주소는 그것 하나다.
+# (노트북에서 직접 스크립트를 돌릴 일이 있으면 그때만 임시로 넓힌다)
+zabbix_server_allow: "<DEV_GPU01_IP>, <TSR_TAILNET_IP>"
+
+# Active 모드로 자동 등록될 때 Zabbix 액션이 이 문자열로 템플릿을 매칭한다.
+zabbix_host_metadata: "linux;ims"
+
+# zabbix_release_url / bmc_user / bmc_privilege 는 각 롤의 defaults/main.yml 에 있다.
+# 환경별로 다르게 하려면 여기서 덮어쓴다.
+
+# 서버별 sudo 비밀번호는 같은 디렉터리의 암호화된 vault.yml 에서 가져온다.
+#   실행: --ask-vault-pass (Vault 비밀번호 1개만 입력, -K 불필요)
+#
+# mandatory 를 쓰는 이유: default(omit) 으로 두면 누락된 호스트에 '<<Omit>>' 문자열이
+# 비밀번호로 전달되어 "Incorrect sudo password" 로 실패한다. mandatory 는 어느 호스트가
+# vault.yml 에 없는지 이름을 찍어주며 멈춘다.
+ansible_become_password: "{{ become_passwords[inventory_hostname] | mandatory }}"

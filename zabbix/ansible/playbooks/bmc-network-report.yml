@@ -1,0 +1,62 @@
+---
+# BMC 네트워크 현황만 조회한다. 아무것도 변경하지 않는다.
+# 채널이 존재하는지, 활성인지, IP 를 어디서 받는지(static/DHCP)까지 봐야
+# 어떤 작업이 필요한지 갈린다.
+- name: BMC network report
+  hosts: ims
+  become: true
+  gather_facts: false
+  tasks:
+    - name: ipmitool 설치 확인
+      ansible.builtin.command: which ipmitool
+      register: has_ipmi
+      changed_when: false
+      failed_when: false
+
+    - name: BMC 자체가 있는지 (KCS 경로)
+      ansible.builtin.shell: |
+        set -o pipefail
+        ipmitool mc info 2>&1 | grep -E 'Manufacturer Name|Product Name|Firmware Revision' || echo "BMC 응답 없음"
+      args:
+        executable: /bin/bash
+      environment:
+        LC_ALL: C
+      register: mc
+      changed_when: false
+      failed_when: false
+      when: has_ipmi.rc == 0
+
+    - name: 채널별 상세
+      ansible.builtin.shell: |
+        set -o pipefail
+        for c in $(seq 1 15); do
+          info=$(ipmitool channel info "$c" 2>/dev/null | awk -F': *' '/Channel Medium Type/{m=$2} /Channel Protocol Type/{p=$2} END{if(m) print m" / "p}')
+          [ -z "$info" ] && continue
+          lan=$(ipmitool lan print "$c" 2>/dev/null | awk -F': +' '
+            /^IP Address Source/{s=$2} /^IP Address  /{ip=$2} /^Subnet Mask/{sn=$2}
+            /^MAC Address/{mac=$2} /^Default Gateway IP/{gw=$2}
+            END{printf "src=%s ip=%s mask=%s gw=%s mac=%s", s, ip, sn, gw, mac}')
+          echo "ch$c [$info] $lan"
+        done
+        exit 0
+      args:
+        executable: /bin/bash
+      environment:
+        LC_ALL: C
+      register: ch
+      changed_when: false
+      failed_when: false
+      when: has_ipmi.rc == 0
+
+    - name: 결과
+      ansible.builtin.debug:
+        msg: >-
+          {{ inventory_hostname }} —
+          {{ (mc.stdout_lines | default(['ipmitool 없음'])) | join(' | ') }}
+          ||  {{ (ch.stdout_lines | default(['채널 없음'])) | join('  ||  ') }}
+      when: has_ipmi.rc == 0
+
+    - name: ipmitool 미설치 안내
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }} — ipmitool 이 없어 조회할 수 없습니다"
+      when: has_ipmi.rc != 0

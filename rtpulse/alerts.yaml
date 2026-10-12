@@ -1,0 +1,60 @@
+# rtpulse alert configuration
+# Use with:  rtpulse -c config.yaml -A alerts.yaml
+# Or embed the `alerts:` block directly inside your config.yaml.
+#
+# ── How jitter alerting works ──────────────────────────────────────────────────
+#   1. rtpulse measures real RTP interarrival jitter on each RTSP probe cycle.
+#   2. When jitter exceeds jitter_warn the stream health becomes Degraded
+#      and a WARNING alert fires via the channels configured below.
+#   3. When jitter exceeds jitter_crit the alert payload is marked CRITICAL,
+#      indicating severe network instability that may cause visible artefacts.
+#   4. A RESOLVED alert fires automatically when jitter drops back below thresholds.
+#
+# ── Alert state machine ────────────────────────────────────────────────────────
+#   Healthy  ──► Degraded  : jitter > jitter_warn  OR  loss > loss_warn  OR  fps < min_fps
+#   Degraded ──► Down      : loss > loss_crit       OR  bitrate < min_bitrate
+#   Any      ──► Healthy   : all metrics back in normal range → RESOLVED alert
+
+alerts:
+  enabled: true
+
+  rules:
+    # ── Packet loss thresholds ──────────────────────────────────────────────
+    loss_warn: 2.0          # % — Degraded (Warning)
+    loss_crit: 10.0         # % — Down (Critical)
+
+    # ── Jitter thresholds ──────────────────────────────────────────────────
+    # High jitter = network congestion or buffer problems.
+    # jitter_warn: stream moves to Degraded → Warning alert fired
+    # jitter_crit: severity escalated to Critical in the alert payload
+    jitter_warn: 50.0       # ms — Warning threshold (visible stuttering likely)
+    jitter_crit: 100.0      # ms — Critical threshold (severe degradation)
+
+    # ── Bitrate floor ──────────────────────────────────────────────────────
+    min_bitrate: 10.0       # kbps — below this = Down (Critical)
+
+    # ── FPS floor ──────────────────────────────────────────────────────────
+    # FPS 체크는 비활성화됨. 서브스트림처럼 원래 낮은 FPS 채널에서 오탐 발생.
+    # 헬스 판단은 bitrate / loss / jitter 3가지로만 결정됨.
+    # min_fps: 15.0
+
+    # ── Cooldown ───────────────────────────────────────────────────────────
+    # Minimum seconds between repeated alerts for the same stream.
+    # Resolved alerts are always sent immediately regardless of cooldown.
+    cooldown_secs: 60
+
+  # ── Slack incoming webhook ─────────────────────────────────────────────────
+  # Create a webhook at https://api.slack.com/apps → Incoming Webhooks
+  slack:
+    - webhook_url: "https://hooks.slack.com/services/T000/B000/XXXX"
+      channel: "#stream-alerts"   # optional — overrides webhook default channel
+      username: rtpulse
+
+  # ── Generic HTTP webhook ───────────────────────────────────────────────────
+  # POST body is JSON (same schema as the Alert struct):
+  #   { stream_id, stream_name, stream_url, severity, message, timestamp, metrics }
+  webhooks:
+    - url: "https://your-server.example.com/api/rtpulse-alert"
+      headers:
+        Authorization: "Bearer your-api-token-here"
+      min_severity: warning   # "warning" | "critical" | "resolved"

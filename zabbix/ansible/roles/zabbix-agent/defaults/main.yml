@@ -1,0 +1,9 @@
+---
+zabbix_server: "127.0.0.1"                 # 인벤토리 group_vars 에서 실제 주소로 덮어쓴다
+
+# Server= (누가 이 에이전트에 질의할 수 있는가). 터널의 서브넷 라우터를 거치면 출발지가
+# 라우터 IP로 SNAT 되므로, Zabbix 서버 주소만으로는 거부된다. 기본값은 zabbix_server 와 동일.
+zabbix_server_allow: "{{ zabbix_server }}"
+zabbix_host_metadata: "linux;ims"        # Zabbix 자동 등록 액션이 이 값으로 템플릿을 고른다
+zabbix_release_url: >-
+  https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_7.0-2+ubuntu{{ ansible_distribution_version }}_all.deb

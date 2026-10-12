@@ -1,0 +1,13 @@
+---
+bmc_user: "zbxmon"
+bmc_privilege: 2          # 2=USER(센서 읽기만). 4=ADMIN은 원격 전원 제어까지 가능해 쓰지 않는다.
+bmc_report_only: false    # true면 현황만 출력하고 변경하지 않는다
+
+# BMC 관리망 대역. 보드에 채널이 여러 개(1번=공유 LAN, 8번=전용 포트 등) 있고
+# 미사용 채널에도 기본 IP(<VENDOR_DEFAULT_BMC_IP> 같은 값)가 박혀 있는 경우가 있어,
+# 이 접두사에 맞는 채널을 우선 선택한다.
+bmc_mgmt_prefix: "<BMC_MGMT_PREFIX>"   # 예: 관리망 대역의 앞 두 옥텟 + "."
+
+# 관리망 대역이 아닌 BMC(제조사 기본값·다른 VLAN 등)에는 계정을 만들지 않는다.
+# 의도적으로 만들려면 -e bmc_allow_nonmgmt=true
+bmc_allow_nonmgmt: false

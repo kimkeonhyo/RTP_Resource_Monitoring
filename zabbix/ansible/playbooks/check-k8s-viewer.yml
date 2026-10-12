@@ -1,0 +1,80 @@
+---
+# 고객사 사이트 k8s 의 vms-viewer 적용 상태를 점검한다. 아무것도 변경하지 않는다.
+#
+# vms-viewer(SA 토큰)는 built-in view + pods/exec·portforward 를 클러스터 전역으로 받는다.
+# Secret 은 API 로 못 읽지만 exec 으로 파드 안의 Secret 을 읽을 수 있고, 토큰은 무만료이며
+# VMS-Product-dev-manifest 의 vms/k8s/out/viewer-*.yml 로 커밋되어 있다.
+# 사이트마다 적용 여부가 달라(2026-09-28: site-e 적용, site-a 미적용) 한 번에 본다.
+#
+#   ansible-playbook playbooks/check-k8s-viewer.yml --ask-vault-pass
+#   ansible-playbook playbooks/check-k8s-viewer.yml --ask-vault-pass --limit site-e
+#
+# sudo 는 쓰지 않는다 — 접속 계정(ops)의 ~/.kube/config 로 조회한다.
+# vault 비밀번호는 group_vars 복호화 때문에 여전히 필요하다.
+#
+# 주의: `kubectl auth can-i create pods/exec` 는 "이름이 exec 인 파드"로 해석돼 항상 no 다.
+#       서브리소스는 --subresource=exec 로 물어야 한다.
+
+- name: vms-viewer 점검
+  hosts: remote_site
+  gather_facts: false
+  become: false
+  tasks:
+    - name: 조회
+      ansible.builtin.shell:
+        executable: /bin/bash
+        cmd: |
+          export PATH="$PATH:/usr/local/bin:/snap/bin"
+          SA=system:serviceaccount:kube-system:vms-viewer
+          ask() { kubectl auth can-i "$@" 2>/dev/null | head -1; }
+          has() { kubectl get "$@" >/dev/null 2>&1 && echo yes || echo no; }
+          if ! kubectl version --request-timeout=5s >/dev/null 2>&1; then
+            echo "kubectl=no"; exit 0
+          fi
+          echo "kubectl=yes"
+          echo "context=$(kubectl config current-context 2>/dev/null)"
+          echo "api=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}' 2>/dev/null)"
+          echo "me_admin=$(ask '*' '*' -A)"
+          echo "sa=$(has -n kube-system sa vms-viewer)"
+          echo "token=$(has -n kube-system secret vms-viewer-token)"
+          echo "crb_view=$(has clusterrolebinding vms-viewer-view)"
+          echo "crb_debug=$(has clusterrolebinding vms-viewer-debug)"
+          echo "secrets=$(ask get secrets -A --as=$SA)"
+          echo "exec=$(ask create pods --subresource=exec -A --as=$SA)"
+          echo "deploy=$(ask get deployments -A --as=$SA)"
+      register: raw
+      changed_when: false
+
+    - name: 정리
+      ansible.builtin.set_fact:
+        viewer: "{{ dict(raw.stdout_lines | select('search', '=') | map('split', '=', 1)) }}"
+
+    - name: 판정
+      ansible.builtin.set_fact:
+        viewer_verdict: >-
+          {%- if viewer.kubectl != 'yes' -%}kubectl 사용 불가 (접속 계정에 kubeconfig 없음)
+          {%- elif viewer.sa != 'yes' -%}미적용 — viewer 없음, admin 공유로 작업
+          {%- elif viewer.exec == 'yes' -%}위험 — 토큰으로 exec 우회해 Secret 열람 가능
+          {%- else -%}적용 — exec 없음 (저장소와 다름, 확인 필요)
+          {%- endif -%}
+
+    - name: 결과
+      ansible.builtin.debug:
+        msg: "{{ viewer_verdict }} | {{ viewer }}"
+
+    # ansible_play_hosts_all 은 --limit 안의 호스트만, 접속 실패한 호스트까지 포함한다.
+    - name: 사이트별 요약
+      run_once: true
+      ansible.builtin.debug:
+        msg: >-
+          {{ item }}: {{ hostvars[item].viewer_verdict | default('접속 실패') }}
+          {%- if hostvars[item].viewer is defined and hostvars[item].viewer.kubectl == 'yes' %}
+          · 기본 권한 admin={{ hostvars[item].viewer.me_admin }}
+          · sa={{ hostvars[item].viewer.sa }} token={{ hostvars[item].viewer.token }}
+          · secrets={{ hostvars[item].viewer.secrets }} exec={{ hostvars[item].viewer.exec }}
+          deploy={{ hostvars[item].viewer.deploy }}
+          · {{ hostvars[item].viewer.api }}
+          {%- endif %}
+      loop: "{{ ansible_play_hosts_all }}"
+      loop_control:
+        label: "{{ item }}"

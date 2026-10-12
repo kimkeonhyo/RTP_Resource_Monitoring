@@ -1,0 +1,53 @@
+{
+  "name": "rtpulse-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@fullcalendar/core": "^6.1.21",
+    "@fullcalendar/daygrid": "^6.1.21",
+    "@fullcalendar/interaction": "^6.1.21",
+    "@fullcalendar/list": "^6.1.21",
+    "@fullcalendar/react": "^6.1.21",
+    "@fullcalendar/timegrid": "^6.1.21",
+    "@types/pako": "^2.0.4",
+    "@types/pg": "^8.20.0",
+    "@types/ssh2": "^1.15.5",
+    "busboy": "^1.6.0",
+    "clsx": "^2.1.1",
+    "date-fns": "^3.6.0",
+    "exceljs": "^4.4.0",
+    "fflate": "^0.8.2",
+    "minio": "^8.0.7",
+    "mysql2": "^3.22.4",
+    "next": "^16.2.3",
+    "next-auth": "^4.24.14",
+    "pako": "^2.1.0",
+    "pg": "^8.20.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-markdown": "^10.1.0",
+    "recharts": "^2.12.7",
+    "remark-gfm": "^4.0.1",
+    "ssh2": "^1.17.0",
+    "swr": "^2.2.5",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/busboy": "^1.5.4",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.0.1",
+    "eslint": "^8",
+    "eslint-config-next": "^16.2.3",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}

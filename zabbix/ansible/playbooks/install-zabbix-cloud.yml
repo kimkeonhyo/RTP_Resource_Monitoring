@@ -1,0 +1,22 @@
+---
+# GCP VM 에 Zabbix Agent2 를 깐다. Ubuntu(apt)·Rocky 계열(dnf) 모두 지원한다.
+# 사내용(install-zabbix-agent.yml)과 갈라 둔 이유는 롤 defaults 주석에 적어 뒀다.
+#
+#   ansible-playbook -i inventory/gcp/hosts.ini playbooks/install-zabbix-cloud.yml --check
+#   ansible-playbook -i inventory/gcp/hosts.ini playbooks/install-zabbix-cloud.yml
+#   ansible-playbook -i inventory/gcp/hosts.ini playbooks/install-zabbix-cloud.yml --limit rtpulse
+#
+# -i 를 반드시 준다. ansible.cfg 의 기본 인벤토리는 사내(ims) 라서
+# 그냥 실행하면 사내 서버를 대상으로 잡는다.
+#
+# 시작 전에 확인할 두 가지 (둘 다 Ansible 밖의 일이다):
+#   1) Zabbix 자동 등록 액션에 HostMetadata 'linux;gcp' 조건이 있어야 호스트가 등록된다.
+#      없으면 에이전트는 정상인데 Zabbix 에 아무것도 나타나지 않는다.
+#   2) GCP VPC 방화벽에 <ZABBIX_SERVER_IP> → tcp:10050 규칙이 있어야 수집된다 (tf-foundation 소관).
+#      롤 마지막에 컨트롤러에서 10050 을 찔러 보고 막혀 있으면 알려준다.
+- name: Install Zabbix agent (GCP VMs)
+  hosts: gcp
+  become: true
+  serial: 5              # 한 번에 5대씩. 저장소 문제가 있으면 전체가 물기 전에 드러난다
+  roles:
+    - install-zabbix-cloud

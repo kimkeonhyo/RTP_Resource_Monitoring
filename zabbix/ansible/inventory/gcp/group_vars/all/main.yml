@@ -1,0 +1,20 @@
+---
+# GCP VM 은 Zabbix 서버와 같은 VPC(<GCP_VPC_CIDR>) 안에 있다.
+# 사내망처럼 dev-gpu01 이 SNAT 하는 구조가 아니라 출발지가 그대로 도착하므로
+# 허용할 주소는 Zabbix 서버 하나다.
+zabbix_server: "<ZABBIX_SERVER_IP>"            # demo-infra-o11y-zabbix
+zabbix_cloud_server_allow: "<ZABBIX_SERVER_IP>"
+
+# 사내(linux;ims)·고객사(linux;remote)와 구분한다.
+# ⚠ Zabbix 에 이 조건을 가진 자동 등록 액션이 있어야 호스트가 등록된다.
+zabbix_host_metadata: "linux;gcp"
+
+# 처음 붙는 VM 이 12대라 호스트키 확인에서 전부 막힌다. accept-new 는 모르는
+# 호스트는 받아 적고 **바뀐 키는 여전히 거부한다** — MIG 가 VM 을 새 디스크로
+# 재생성하면 여기서 걸리는데, 그건 실제로 확인해야 할 변화라 걸리는 게 맞다.
+# StrictHostKeyChecking=no 로 두면 그 보호까지 사라지므로 쓰지 않는다.
+ansible_ssh_common_args: "-o StrictHostKeyChecking=accept-new"
+
+# become 비밀번호를 두지 않는다 — GCP 는 OS Login 으로 sudo NOPASSWD 다.
+# 접속 계정은 실행할 때 준다:  -u ops_example_com
+# 사내(ims) 인벤토리는 vault 비밀번호를 mandatory 로 요구하므로 섞어 쓰면 안 된다.

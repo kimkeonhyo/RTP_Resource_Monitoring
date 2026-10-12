@@ -1,0 +1,11 @@
+---
+- name: refresh apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    lock_timeout: 300   # unattended-upgrades 가 락을 잡고 있으면 기다린다 (기본 60초로는 부족)
+  failed_when: false     # 무관한 서드파티 저장소가 깨져 있어도 진행 (설치 단계에서 판단)
+
+- name: restart zabbix-agent2
+  ansible.builtin.systemd:
+    name: zabbix-agent2
+    state: restarted

@@ -1,0 +1,252 @@
+---
+# 지원 대상만 통과시킨다. COS(Container-Optimized OS) 는 패키지 매니저가 없어
+# 에이전트를 깔 수 없다 — gatus·infisical VM 이 여기 해당한다.
+# 그 장비는 ICMP·HTTP 체크나 컨테이너 에이전트로 따로 봐야 한다.
+- name: 지원되는 OS 인지 확인
+  ansible.builtin.assert:
+    that: ansible_os_family in ['Debian', 'RedHat']
+    fail_msg: >-
+      {{ inventory_hostname }} — 이 롤은 Ubuntu/Rocky 계열만 지원합니다
+      (현재: {{ ansible_distribution }} {{ ansible_distribution_version }}).
+      COS 라면 패키지 설치가 불가하니 인벤토리에서 제외하세요.
+
+# ── 저장소 ──────────────────────────────────────────────────────────────
+# 저장소 등록 여부를 먼저 보고 없을 때만 넣는다. release 패키지를 매번 다시
+# 설치하면 그때마다 changed 로 잡혀 무엇이 실제로 바뀌었는지 안 보인다.
+- name: Zabbix 저장소 등록 여부 확인
+  ansible.builtin.stat:
+    path: "{{ '/etc/apt/sources.list.d/zabbix.list' if ansible_os_family == 'Debian'
+              else '/etc/yum.repos.d/zabbix.repo' }}"
+  register: zbx_repo
+
+- name: Ubuntu — zabbix-release 설치
+  ansible.builtin.apt:
+    deb: "{{ zabbix_release_url_deb }}"
+    lock_timeout: 300      # unattended-upgrades 가 락을 잡고 있으면 기다린다
+  when:
+    - ansible_os_family == 'Debian'
+    - not zbx_repo.stat.exists
+
+# 인덱스가 낡으면 404 가 난다. 다만 무관한 서드파티 저장소 하나가 깨져도
+# apt 모듈은 태스크를 실패로 처리하므로, 갱신 실패는 넘기고 설치에서 판단한다.
+- name: Ubuntu — apt 인덱스 갱신
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+    lock_timeout: 300
+  when: ansible_os_family == 'Debian'
+  failed_when: false
+
+- name: Rocky — zabbix-release 설치
+  ansible.builtin.dnf:
+    name: "{{ zabbix_release_url_rpm }}"
+    state: present
+    disable_gpg_check: true   # release 패키지 자체는 아직 키가 없어 검증할 수 없다
+  when:
+    - ansible_os_family == 'RedHat'
+    - not zbx_repo.stat.exists
+
+# Rocky 는 EPEL 에도 zabbix 패키지가 있어 버전이 섞일 수 있다.
+# release 패키지가 /etc/yum.repos.d/zabbix.repo 에 excludepkgs 를 넣어 주지만
+# EPEL 쪽 우선순위가 높은 경우가 있어 어느 저장소에서 오는지 찍어 둔다.
+- name: Rocky — 어느 저장소에서 오는지 확인
+  # --latest-limit 1 이 없으면 저장소에 있는 모든 버전(17개)이 통째로 찍힌다.
+  ansible.builtin.command: >-
+    dnf -q repoquery --latest-limit 1 --qf '%{repoid} %{version}-%{release}' zabbix-agent2
+  environment:
+    LC_ALL: C
+  register: zbx_repoq
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  when: ansible_os_family == 'RedHat'
+
+- name: 저장소 조회 실패로 중단
+  ansible.builtin.fail:
+    msg: >-
+      {{ inventory_hostname }} — zabbix-agent2 를 조회할 수 없습니다.
+      dnf 저장소를 먼저 확인하세요 (등록: {{ zbx_repo.stat.exists }}).
+  when:
+    - not ansible_check_mode
+    - ansible_os_family == 'RedHat'
+    - zbx_repoq.stdout is defined
+    - not zbx_repoq.stdout
+
+# --check 에서는 위 저장소 등록이 실제로 일어나지 않아 패키지를 찾을 수 없다.
+- name: zabbix-agent2 설치
+  ansible.builtin.package:
+    name: zabbix-agent2
+    state: present
+  register: agent_pkg
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: check 모드에서는 여기서 종료
+  ansible.builtin.debug:
+    msg: >-
+      --check 에서는 저장소가 실제로 등록되지 않아 zabbix-agent2 를 조회할 수 없습니다.
+      이후 태스크도 건너뜁니다. 실제 적용은 --check 없이 실행하세요.
+  when:
+    - ansible_check_mode
+    - agent_pkg is failed
+
+- name: 여기서 끝 (check 모드)
+  ansible.builtin.meta: end_host
+  when:
+    - ansible_check_mode
+    - agent_pkg is failed
+
+# ── 설정 ────────────────────────────────────────────────────────────────
+# Server/ServerActive/Hostname/HostMetadata 는 본 설정 파일에 있어야 한다.
+# Hostname 은 OS 호스트명이 아니라 인벤토리 별칭을 쓴다 — GCP VM 이름에는
+# 재생성 때 바뀌는 난수 접미사가 붙어 그대로 쓰면 호스트가 갈라진다.
+- name: 에이전트 기본 설정
+  ansible.builtin.lineinfile:
+    path: /etc/zabbix/zabbix_agent2.conf
+    regexp: "^\\s*{{ item.key }}\\s*="   # 주석(# Server=)이 아니라 실제 설정 줄만
+    line: "{{ item.key }}={{ item.value }}"
+  loop:
+    - { key: "Server",       value: "{{ zabbix_cloud_server_allow }}" }
+    - { key: "ServerActive", value: "{{ zabbix_server }}" }
+    - { key: "Hostname",     value: "{{ zabbix_hostname }}" }
+    - { key: "HostMetadata", value: "{{ zabbix_host_metadata }}" }
+    - { key: "Timeout",      value: "{{ zabbix_agent_timeout }}" }
+  loop_control:
+    label: "{{ item.key }}"
+  notify: restart zabbix-agent2
+
+# ── watch 등록 폼이 남긴 드롭인과 값 맞추기 ────────────────────────────
+# /etc/zabbix/zabbix_agent2.d/*.conf 는 Include 로 본 설정보다 **뒤에** 읽힌다.
+# 같은 항목이 양쪽에 있으면 드롭인이 이긴다. watch 등록 폼이 만든 ims.conf 에
+# 다른 Hostname 이 남아 있으면 여기서 쓴 값이 조용히 무시되고, Zabbix 서버 로그에
+# "cannot process heartbeat from host ...: host not found" 가 1분마다 쌓인다.
+# 패시브 수집은 IP 로 하니 멀쩡해 보여서 알아채기 어렵다 (2026-09-09 rtpulse).
+#
+# 지우지 않고 값을 맞춘다 — 어느 쪽이 이기든 결과가 같아야 안전하다.
+- name: watch 드롭인 존재 확인
+  ansible.builtin.stat:
+    path: /etc/zabbix/zabbix_agent2.d/ims.conf
+  register: zbx_dropin
+
+- name: 드롭인 값을 본 설정과 맞춤
+  ansible.builtin.lineinfile:
+    path: /etc/zabbix/zabbix_agent2.d/ims.conf
+    regexp: "^\\s*{{ item.key }}\\s*="
+    line: "{{ item.key }}={{ item.value }}"
+  loop:
+    - { key: "Server",       value: "{{ zabbix_cloud_server_allow }}" }
+    - { key: "ServerActive", value: "{{ zabbix_server }}" }
+    - { key: "Hostname",     value: "{{ zabbix_hostname }}" }
+    - { key: "HostMetadata", value: "{{ zabbix_host_metadata }}" }
+    - { key: "Timeout",      value: "{{ zabbix_agent_timeout }}" }
+  loop_control:
+    label: "{{ item.key }}"
+  when: zbx_dropin.stat.exists
+  notify: restart zabbix-agent2
+
+# ── 방화벽 ──────────────────────────────────────────────────────────────
+# GCP 는 VPC 방화벽으로 막는 게 보통이라 VM 안의 방화벽은 꺼져 있는 경우가 많다.
+# 켜져 있을 때만 손댄다. 규칙은 매번 다시 넣는다 — '이미 있으면 건너뛴다' 로 두면
+# 허용 주소를 넓혔을 때 낡은 규칙만 남는다 (사내에서 실제로 겪었다).
+- name: firewalld 활성 여부 확인
+  ansible.builtin.command: systemctl is-active firewalld
+  register: fwd
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: firewalld 에 에이전트 포트 허용
+  ansible.posix.firewalld:
+    rich_rule: "rule family=ipv4 source address={{ item }} port port=10050 protocol=tcp accept"
+    permanent: true
+    immediate: true
+    state: enabled
+  loop: "{{ zabbix_cloud_server_allow.split(',') | map('trim') | list }}"
+  when: fwd.stdout | default('') == 'active'
+
+- name: ufw 활성 여부 확인
+  ansible.builtin.command: ufw status
+  register: ufw_status
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  when: ansible_os_family == 'Debian'
+
+- name: ufw 에 에이전트 포트 허용
+  community.general.ufw:
+    rule: allow
+    from_ip: "{{ item }}"
+    port: "10050"
+    proto: tcp
+  loop: "{{ zabbix_cloud_server_allow.split(',') | map('trim') | list }}"
+  when:
+    - ansible_os_family == 'Debian'
+    - ufw_status.rc | default(1) == 0
+    - "'inactive' not in (ufw_status.stdout | default('inactive'))"
+
+# ── SELinux ─────────────────────────────────────────────────────────────
+# Rocky 는 기본 enforcing 이다. 10050/tcp 는 배포된 zabbix 정책에 이미 들어 있어
+# 기본 수집은 그냥 된다. 막히는 것은 UserParameter 로 외부 스크립트를 돌릴 때인데
+# 클라우드 VM 에는 그런 게 없다. 그러니 끄지 않고 상태만 남긴다 —
+# 관제 편의를 위해 SELinux 를 permissive 로 내리는 것은 대가가 너무 크다.
+- name: SELinux 상태 확인
+  ansible.builtin.command: getenforce
+  register: selinux
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+# ── 기동·검증 ───────────────────────────────────────────────────────────
+- name: 서비스 기동 및 부팅 시 자동 시작
+  ansible.builtin.systemd:
+    name: zabbix-agent2
+    state: started
+    enabled: true
+
+- name: 설정 반영을 위해 대기 중인 재시작 처리
+  ansible.builtin.meta: flush_handlers
+
+- name: 동작 확인
+  ansible.builtin.command: zabbix_agent2 -t agent.ping
+  register: agent_ping
+  changed_when: false
+  when: not ansible_check_mode
+
+# 로컬 '-t' 는 에이전트 내부만 본다. Zabbix 가 실제로 쓰는 경로를 보려면
+# 밖에서 붙어봐야 한다. GCP 는 VPC 방화벽이 별도라 여기서 막히는 일이 흔하다 —
+# 그 규칙은 Ansible 이 아니라 tf-foundation 에서 열어야 한다.
+- name: 컨트롤러에서 에이전트 포트 접속 확인
+  ansible.builtin.wait_for:
+    host: "{{ ansible_host | default(inventory_hostname) }}"
+    port: 10050
+    timeout: 5
+    state: started
+  delegate_to: localhost
+  become: false
+  # localhost 로 위임하면 호스트 변수가 따라가지 않아 group_vars 의
+  # become_passwords[inventory_hostname] | mandatory 가 다시 평가된다.
+  # vault.yml 에 없는 호스트(sudo NOPASSWD)는 여기서 멈춘다. become 을 쓰지
+  # 않는 태스크이므로 빈 값으로 덮는다.
+  vars:
+    ansible_become_password: ""
+  register: port_check
+  failed_when: false
+  check_mode: false
+
+- name: 포트 접속 실패 안내
+  ansible.builtin.debug:
+    msg: >-
+      {{ inventory_hostname }} — 컨트롤러에서 10050 접속이 안 됩니다.
+      에이전트는 동작 중입니다. GCP VPC 방화벽에 {{ zabbix_cloud_server_allow }} →
+      tcp:10050 규칙이 있는지 확인하세요 (tf-foundation 소관).
+  when: port_check.failed | default(false) or port_check.state is not defined
+
+- name: 결과
+  ansible.builtin.debug:
+    msg: >-
+      {{ zabbix_hostname }} ({{ ansible_distribution }} {{ ansible_distribution_major_version }})
+      — SELinux {{ selinux.stdout | default('없음') }},
+      방화벽 {{ 'firewalld' if fwd.stdout | default('') == 'active'
+                else ('ufw' if (ufw_status.stdout is defined and 'inactive' not in ufw_status.stdout) else '없음') }}
+      {{ '' if ansible_check_mode else
+         ' / agent.ping ' + ('OK' if '[s|1]' in (agent_ping.stdout | default('')) else 'FAIL') }}
+      {{ '/ ' + zbx_repoq.stdout if (zbx_repoq.stdout is defined and zbx_repoq.stdout) else '' }}

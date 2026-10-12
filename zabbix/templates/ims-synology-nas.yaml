@@ -1,0 +1,326 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: e960332b3f6c46a1956486d4f3f99fce
+      name: 'Templates/Server hardware'
+  templates:
+    - uuid: ff1b56ddf6184c01b2f7a2c308b4d98d
+      template: 'IMS Synology NAS by SNMP'
+      name: 'IMS Synology NAS by SNMP'
+      groups:
+        - name: 'Templates/Server hardware'
+      items:
+        - uuid: 0aa0c157a05045dab0b619194e864c39
+          name: 'CPU idle'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.11.11.0
+          key: syno.cpu.idle
+          value_type: FLOAT
+          units: '%'
+        - uuid: 154ef8ba35e44de18d81beda4535c35c
+          name: 'CPU 사용률'
+          type: CALCULATED
+          key: syno.cpu.util
+          value_type: FLOAT
+          units: '%'
+          params: 100-last(//syno.cpu.idle)
+        - uuid: f4f058dd43994072ad71bb60134e3760
+          name: 'DSM 버전'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.6574.1.5.3.0
+          key: syno.dsm.version
+          delay: 1h
+          value_type: CHAR
+          trends: '0'
+        - uuid: 32f794a0efbb4090a08d40f638c7426b
+          name: 'CPU 팬'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.6574.1.4.2.0
+          key: syno.fan.cpu
+          delay: 2m
+          valuemap:
+            name: 'Synology 상태'
+          triggers:
+            - uuid: 35bdef23780c4f95a179bb2ab8895291
+              expression: 'last(/IMS Synology NAS by SNMP/syno.fan.cpu)<>1'
+              name: 'CPU 팬 이상'
+              priority: HIGH
+        - uuid: 4ebfc535bcf8417f981ff580fffe6ab6
+          name: '시스템 팬'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.6574.1.4.1.0
+          key: syno.fan.system
+          delay: 2m
+          valuemap:
+            name: 'Synology 상태'
+          triggers:
+            - uuid: ca9e600db7b044bc9e11fbbf0e289fd2
+              expression: 'last(/IMS Synology NAS by SNMP/syno.fan.system)<>1'
+              name: '시스템 팬 이상'
+              priority: HIGH
+        - uuid: f1f44fe299f64015831669a4da099e41
+          name: '메모리 가용'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.4.6.0
+          key: syno.mem.avail
+          units: B
+          preprocessing:
+            - type: MULTIPLIER
+              parameters:
+                - '1024'
+        - uuid: 3a1eb1a2530f420a8e2a3b4f0c10d94f
+          name: '메모리 버퍼'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.4.14.0
+          key: syno.mem.buffer
+          units: B
+          preprocessing:
+            - type: MULTIPLIER
+              parameters:
+                - '1024'
+        - uuid: 230911d7f2144119a24717e416136cfa
+          name: '메모리 캐시'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.4.15.0
+          key: syno.mem.cached
+          units: B
+          preprocessing:
+            - type: MULTIPLIER
+              parameters:
+                - '1024'
+        - uuid: 5e4470f5b2cd4285813ff0b545b40085
+          name: '메모리 총량'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.4.5.0
+          key: syno.mem.total
+          units: B
+          preprocessing:
+            - type: MULTIPLIER
+              parameters:
+                - '1024'
+        - uuid: 72bf82c517fc414e87d95a19c181b8fb
+          name: '메모리 사용률'
+          type: CALCULATED
+          key: syno.mem.util
+          value_type: FLOAT
+          units: '%'
+          params: '100*(last(//syno.mem.total)-last(//syno.mem.avail)-last(//syno.mem.buffer)-last(//syno.mem.cached))/last(//syno.mem.total)'
+          description: '버퍼·캐시는 회수 가능한 메모리라 사용량에서 제외한다.'
+        - uuid: 4606c98cda9f401ab8dc8d5535fff29f
+          name: 모델명
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.6574.1.5.1.0
+          key: syno.model
+          delay: 1h
+          value_type: CHAR
+          trends: '0'
+        - uuid: 5bfbbdc9398944b38127c178706cdf13
+          name: '전원 상태'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.6574.1.3.0
+          key: syno.power.status
+          delay: 2m
+          valuemap:
+            name: 'Synology 상태'
+          triggers:
+            - uuid: ab30de91661040039991205e82879c0f
+              expression: 'last(/IMS Synology NAS by SNMP/syno.power.status)<>1'
+              name: '전원 이상'
+              priority: DISASTER
+        - uuid: 29be7cd4646343e49e8c12cdf0102835
+          name: 시리얼번호
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.6574.1.5.2.0
+          key: syno.serial
+          delay: 1h
+          value_type: CHAR
+          trends: '0'
+          description: 'IMS 자산 대장의 S/N과 대조할 수 있다.'
+        - uuid: 96df3787a2664d5ca08acc14ddde9d62
+          name: '시스템 상태'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.6574.1.1.0
+          key: syno.system.status
+          delay: 2m
+          valuemap:
+            name: 'Synology 상태'
+          triggers:
+            - uuid: 34565b11096c40ce86e669451e51505d
+              expression: 'last(/IMS Synology NAS by SNMP/syno.system.status)<>1'
+              name: '시스템 상태 이상'
+              priority: HIGH
+        - uuid: 349dd767d86e4ad6bea633b6084980bb
+          name: 'NAS 온도'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.6574.1.2.0
+          key: syno.temp
+          delay: 2m
+          units: °C
+          triggers:
+            - uuid: 1693316c99624f669b2577bcf97d7869
+              expression: 'min(/IMS Synology NAS by SNMP/syno.temp,5m)>{$NAS.TEMP.WARN}'
+              name: 'NAS 온도 높음 (>{$NAS.TEMP.WARN}°C)'
+              priority: AVERAGE
+        - uuid: 32e71dbb02324d658f1949180a114ed1
+          name: '업그레이드 상태'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.6574.1.5.4.0
+          key: syno.upgrade
+          delay: 1h
+          triggers:
+            - uuid: 30e23bf43c1e4df7808f3ec222481425
+              expression: 'last(/IMS Synology NAS by SNMP/syno.upgrade)=2'
+              name: 'DSM 업그레이드 가능'
+              priority: INFO
+      discovery_rules:
+        - uuid: a4d8faf4fa0b4607a02d3a6c68b9be16
+          name: '디스크 발견'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#DISKNAME},1.3.6.1.4.1.6574.2.1.1.2]'
+          key: syno.disk.discovery
+          delay: 1h
+          item_prototypes:
+            - uuid: ff0aa4d1321e462085b8252bfde91c2b
+              name: '{#DISKNAME}: 상태'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.6574.2.1.1.5.{#SNMPINDEX}'
+              key: 'syno.disk.status[{#SNMPINDEX}]'
+              delay: 2m
+              valuemap:
+                name: 'Synology 상태'
+              trigger_prototypes:
+                - uuid: a2a83f24bf6148e9b0eddbcb4374ed6f
+                  expression: 'last(/IMS Synology NAS by SNMP/syno.disk.status[{#SNMPINDEX}])<>1'
+                  name: '{#DISKNAME}: 디스크 이상'
+                  priority: HIGH
+            - uuid: 84a8fa01c2584ab78d001d0c7a2c52fc
+              name: '{#DISKNAME}: 온도'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.6574.2.1.1.6.{#SNMPINDEX}'
+              key: 'syno.disk.temp[{#SNMPINDEX}]'
+              delay: 2m
+              units: °C
+              trigger_prototypes:
+                - uuid: d164131e098d4da98039a39e83e3bf6a
+                  expression: 'min(/IMS Synology NAS by SNMP/syno.disk.temp[{#SNMPINDEX}],5m)>{$NAS.DISK.TEMP.WARN}'
+                  name: '{#DISKNAME}: 디스크 온도 높음 (>{$NAS.DISK.TEMP.WARN}°C)'
+                  priority: WARNING
+        - uuid: fa60870b231c4391a10c8c4edd5a136d
+          name: '스토리지 풀 발견'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#POOLNAME},1.3.6.1.4.1.6574.3.1.1.2]'
+          key: syno.pool.discovery
+          delay: 1h
+          filter:
+            conditions:
+              - macro: '{#POOLNAME}'
+                value: '^Storage Pool'
+                formulaid: A
+          item_prototypes:
+            - uuid: 0e9d44e767c44ae5ad273030df820e6e
+              name: '{#POOLNAME}: 상태'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.6574.3.1.1.3.{#SNMPINDEX}'
+              key: 'syno.pool.status[{#SNMPINDEX}]'
+              delay: 2m
+              valuemap:
+                name: 'Synology 상태'
+              trigger_prototypes:
+                - uuid: 666011cd3e584dd09058ee318515b838
+                  expression: 'last(/IMS Synology NAS by SNMP/syno.pool.status[{#SNMPINDEX}])<>1'
+                  name: '{#POOLNAME}: 스토리지 풀 이상'
+                  priority: DISASTER
+            - uuid: 50b726de0a7548d7b7ede31cea5cea6f
+              name: '{#POOLNAME}: 전체 용량'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.6574.3.1.1.5.{#SNMPINDEX}'
+              key: 'syno.pool.total[{#SNMPINDEX}]'
+              delay: 5m
+              units: B
+        - uuid: 71f08ba58fe14a6094552d198a83a4ce
+          name: '볼륨 발견'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#VOLNAME},1.3.6.1.4.1.6574.3.1.1.2]'
+          key: syno.vol.discovery
+          delay: 1h
+          filter:
+            conditions:
+              - macro: '{#VOLNAME}'
+                value: ^Volume
+                formulaid: A
+          item_prototypes:
+            - uuid: c736e468e257474c8e18c067bb8bbfe9
+              name: '{#VOLNAME}: 여유 용량'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.6574.3.1.1.4.{#SNMPINDEX}'
+              key: 'syno.vol.free[{#SNMPINDEX}]'
+              delay: 5m
+              units: B
+            - uuid: f1821c9ad7634f0fb64cf15c7b94ac4f
+              name: '{#VOLNAME}: 상태'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.6574.3.1.1.3.{#SNMPINDEX}'
+              key: 'syno.vol.status[{#SNMPINDEX}]'
+              delay: 2m
+              valuemap:
+                name: 'Synology 상태'
+              trigger_prototypes:
+                - uuid: 37b8b59f43ef468faab3f661bf7cbfa3
+                  expression: 'last(/IMS Synology NAS by SNMP/syno.vol.status[{#SNMPINDEX}])<>1'
+                  name: '{#VOLNAME}: 볼륨 이상'
+                  priority: HIGH
+            - uuid: acab8939f4d1437d932d3979ed5266fa
+              name: '{#VOLNAME}: 전체 용량'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.6574.3.1.1.5.{#SNMPINDEX}'
+              key: 'syno.vol.total[{#SNMPINDEX}]'
+              delay: 5m
+              units: B
+            - uuid: 99d953fc490d439db9f4e16522a099e9
+              name: '{#VOLNAME}: 사용률'
+              type: CALCULATED
+              key: 'syno.vol.used[{#SNMPINDEX}]'
+              delay: 5m
+              value_type: FLOAT
+              units: '%'
+              params: '100*(last(//syno.vol.total[{#SNMPINDEX}])-last(//syno.vol.free[{#SNMPINDEX}]))/last(//syno.vol.total[{#SNMPINDEX}])'
+              trigger_prototypes:
+                - uuid: d041100e435844c7bfa661fe2f081e5f
+                  expression: 'min(/IMS Synology NAS by SNMP/syno.vol.used[{#SNMPINDEX}],10m)>{$NAS.VOL.USED.WARN}'
+                  name: '{#VOLNAME}: 사용률 높음 (>{$NAS.VOL.USED.WARN}%)'
+                  priority: WARNING
+                - uuid: 5f5d27bba4cf470980450d418f4981ee
+                  expression: 'min(/IMS Synology NAS by SNMP/syno.vol.used[{#SNMPINDEX}],10m)>{$NAS.VOL.USED.CRIT}'
+                  name: '{#VOLNAME}: 사용률 심각 (>{$NAS.VOL.USED.CRIT}%)'
+                  priority: HIGH
+      macros:
+        - macro: '{$NAS.DISK.TEMP.WARN}'
+          value: '50'
+        - macro: '{$NAS.TEMP.WARN}'
+          value: '50'
+        - macro: '{$NAS.VOL.USED.CRIT}'
+          value: '90'
+        - macro: '{$NAS.VOL.USED.WARN}'
+          value: '80'
+        - macro: '{$SNMP_COMMUNITY}'
+          value: public
+      valuemaps:
+        - uuid: cc3732f797b44a1d8b43845dde64445a
+          name: 'Synology 상태'
+          mappings:
+            - value: '1'
+              newvalue: 정상
+            - value: '2'
+              newvalue: 실패
+            - value: '3'
+              newvalue: 미장착
+            - value: '4'
+              newvalue: '초기화 중'
+            - value: '5'
+              newvalue: 크래시
+            - value: '6'
+              newvalue: degraded
+            - value: '11'
+              newvalue: degraded
+            - value: '12'
+              newvalue: 크래시

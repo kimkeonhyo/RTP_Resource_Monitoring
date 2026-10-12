@@ -1,0 +1,4 @@
+# Vault 로 암호화된 파일은 커밋해도 안전하지만, 실수로 평문을 두는 것을 막는다
+*.vault-plain.yml
+vault-password.txt
+.vault_pass

@@ -1,0 +1,891 @@
+{
+  "name": "IMS 네트워크 관제",
+  "display_period": "30",
+  "auto_start": "1",
+  "pages": [
+    {
+      "name": "개요",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "honeycomb",
+          "name": "포트 사용률 — UP 포트 전체 · 초록<50 노랑<70 주황<85 빨강 85%↑",
+          "x": "0",
+          "y": "0",
+          "width": "48",
+          "height": "13",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "*사용률*"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{{ITEM.NAME}.regsub(\"사용률: (.*)\",\"\\1\")}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AAAAA"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "FFD54F"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "50"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.color",
+              "value": "FF8C00"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.2.threshold",
+              "value": "70"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.3.threshold",
+              "value": "85"
+            }
+          ]
+        },
+        {
+          "type": "problems",
+          "name": "현재 장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "13",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "2",
+              "name": "groupids.0",
+              "value": "IMS PoC"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "CPU 사용량",
+          "x": "0",
+          "y": "13",
+          "width": "72",
+          "height": "7",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*CPU utilization*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ABAAA"
+            },
+            {
+              "type": "0",
+              "name": "ds.0.transparency",
+              "value": "2"
+            },
+            {
+              "type": "0",
+              "name": "ds.0.fill",
+              "value": "0"
+            },
+            {
+              "type": "0",
+              "name": "righty",
+              "value": "0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "서버·WS",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "honeycomb",
+          "name": "서버·워크스테이션 응답 (초록=정상 · 빨강=무응답)",
+          "x": "0",
+          "y": "0",
+          "width": "48",
+          "height": "12",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "2",
+              "name": "groupids.0",
+              "value": "IMS 서버·워크스테이션"
+            },
+            {
+              "type": "1",
+              "name": "items.0",
+              "value": "ICMP ping"
+            },
+            {
+              "type": "1",
+              "name": "primary_label",
+              "value": "{HOST.NAME}"
+            },
+            {
+              "type": "0",
+              "name": "secondary_label_decimal_places",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AAAAA"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.0.threshold",
+              "value": "0"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.color",
+              "value": "B2DF8A"
+            },
+            {
+              "type": "1",
+              "name": "thresholds.1.threshold",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "type": "problems",
+          "name": "서버·WS 장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "12",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "2",
+              "name": "groupids.0",
+              "value": "IMS 서버·워크스테이션"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "응답 지연 (ICMP)",
+          "x": "0",
+          "y": "12",
+          "width": "48",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "ICMP response time"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ABAAA"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "패킷 손실률 %",
+          "x": "48",
+          "y": "12",
+          "width": "24",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "ICMP loss"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ACAAA"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "r",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "svggraph",
+          "name": "r — 포트 사용률 %",
+          "x": "0",
+          "y": "0",
+          "width": "48",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "r"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*사용률*"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ACAAA"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            }
+          ]
+        },
+        {
+          "type": "problems",
+          "name": "r — 장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "r"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "r — 포트 트래픽 (수신/송신)",
+          "x": "0",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "r"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*Bits received*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "r"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Bits sent*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ADAAA"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "r — CPU / 메모리",
+          "x": "36",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "r"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*CPU utilization*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "r"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Memory utilization*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "4E9BE8"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AEAAA"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sw-access",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "svggraph",
+          "name": "sw-access — 포트 사용률 %",
+          "x": "0",
+          "y": "0",
+          "width": "48",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "sw-access"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*사용률*"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AFAAA"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            }
+          ]
+        },
+        {
+          "type": "problems",
+          "name": "sw-access — 장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "sw-access"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "sw-access — 포트 트래픽 (수신/송신)",
+          "x": "0",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "sw-access"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*Bits received*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "sw-access"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Bits sent*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AGAAA"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "sw-access — CPU / 메모리",
+          "x": "36",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "sw-access"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*CPU utilization*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "sw-access"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Memory utilization*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "4E9BE8"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AHAAA"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sw-core",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "svggraph",
+          "name": "sw-core — 포트 사용률 %",
+          "x": "0",
+          "y": "0",
+          "width": "48",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "sw-core"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*사용률*"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AIAAA"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            }
+          ]
+        },
+        {
+          "type": "problems",
+          "name": "sw-core — 장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "sw-core"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "sw-core — 포트 트래픽 (수신/송신)",
+          "x": "0",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "sw-core"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*Bits received*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "sw-core"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Bits sent*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AJAAA"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "sw-core — CPU / 메모리",
+          "x": "36",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "sw-core"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*CPU utilization*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "sw-core"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Memory utilization*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "4E9BE8"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AKAAA"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sw-office",
+      "display_period": "0",
+      "widgets": [
+        {
+          "type": "svggraph",
+          "name": "sw-office — 포트 사용률 %",
+          "x": "0",
+          "y": "0",
+          "width": "48",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "sw-office"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*사용률*"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ALAAA"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            }
+          ]
+        },
+        {
+          "type": "problems",
+          "name": "sw-office — 장애",
+          "x": "48",
+          "y": "0",
+          "width": "24",
+          "height": "9",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "3",
+              "name": "hostids.0",
+              "value": "sw-office"
+            },
+            {
+              "type": "0",
+              "name": "show_tags",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "sw-office — 포트 트래픽 (수신/송신)",
+          "x": "0",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "sw-office"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*Bits received*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "sw-office"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Bits sent*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "0EC9AC"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "AMAAA"
+            }
+          ]
+        },
+        {
+          "type": "svggraph",
+          "name": "sw-office — CPU / 메모리",
+          "x": "36",
+          "y": "9",
+          "width": "36",
+          "height": "8",
+          "view_mode": "0",
+          "fields": [
+            {
+              "type": "1",
+              "name": "ds.0.hosts.0",
+              "value": "sw-office"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.items.0",
+              "value": "*CPU utilization*"
+            },
+            {
+              "type": "1",
+              "name": "ds.0.color",
+              "value": "FF465C"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.hosts.0",
+              "value": "sw-office"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.items.0",
+              "value": "*Memory utilization*"
+            },
+            {
+              "type": "1",
+              "name": "ds.1.color",
+              "value": "4E9BE8"
+            },
+            {
+              "type": "1",
+              "name": "reference",
+              "value": "ANAAA"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

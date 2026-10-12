@@ -1,0 +1,77 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    - uuid: ae44f6d0c23f4e0892a62962110ea2f8
+      template: 'IMS NETGEAR XS724TM by SNMP'
+      name: 'IMS NETGEAR XS724TM by SNMP'
+      groups:
+        - name: 'Templates/Network devices'
+      items:
+        - uuid: e44a3a7f8e594728bcf91f8cd88b0b13
+          name: 'NETGEAR: CPU utilization'
+          type: DEPENDENT
+          key: netgear.cpu.util
+          delay: '0'
+          value_type: FLOAT
+          units: '%'
+          description: '프로세스별 60초 평균값을 합산한 전체 CPU 사용률.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - 'var re=/60 Sec \(\s*([0-9.]+)%\)/g, m, sum=0;while((m=re.exec(value))!==null){sum+=parseFloat(m[1]);}return sum.toFixed(2);'
+          master_item:
+            key: 'walk[1.3.6.1.4.1.4526.11.1.1.4.8.1.3]'
+          triggers:
+            - uuid: b8479df12bf849bb88a3ff8364b189ca
+              expression: 'min(/IMS NETGEAR XS724TM by SNMP/netgear.cpu.util,5m)>{$CPU.UTIL.CRIT}'
+              name: 'NETGEAR: CPU 사용률 높음 (>{$CPU.UTIL.CRIT}%)'
+              priority: AVERAGE
+        - uuid: d7a9a7892d5340cebf460e550c8bbb43
+          name: 'NETGEAR: Available memory'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.4526.11.1.1.4.1.0
+          key: netgear.mem.avail
+          units: B
+          preprocessing:
+            - type: MULTIPLIER
+              parameters:
+                - '1024'
+        - uuid: 55b1a43d499141f497c4df20c919078b
+          name: 'NETGEAR: Total memory'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.4526.11.1.1.4.2.0
+          key: netgear.mem.total
+          units: B
+          description: 'XS724TM(S3600)은 Fastpath MIB(4526.10)가 아니라 4526.11 트리를 쓴다. 공식 Netgear 템플릿의 CPU/메모리 아이템이 이 기종에서 동작하지 않아 직접 정의한다.'
+          preprocessing:
+            - type: MULTIPLIER
+              parameters:
+                - '1024'
+        - uuid: 73e3a757713c4fb9b7b7ffc2aada3e3f
+          name: 'NETGEAR: Memory utilization'
+          type: CALCULATED
+          key: netgear.mem.util
+          value_type: FLOAT
+          units: '%'
+          params: '100*(last(//netgear.mem.total)-last(//netgear.mem.avail))/last(//netgear.mem.total)'
+          triggers:
+            - uuid: 09571eb685814a9790c5df4969dcb740
+              expression: 'min(/IMS NETGEAR XS724TM by SNMP/netgear.mem.util,5m)>{$MEMORY.UTIL.MAX}'
+              name: 'NETGEAR: 메모리 사용률 높음 (>{$MEMORY.UTIL.MAX}%)'
+              priority: AVERAGE
+        - uuid: 790ba2f51d6345c5a6578992e86e1a4e
+          name: 'NETGEAR: CPU walk (raw)'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.4526.11.1.1.4.8.1.3]'
+          key: 'walk[1.3.6.1.4.1.4526.11.1.1.4.8.1.3]'
+          value_type: TEXT
+          trends: '0'
+          description: '프로세스별 CPU 사용률이 "5 Sec ( x%) 60 Sec ( y%) 300 Sec ( z%)" 문자열로 온다.'
+      macros:
+        - macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        - macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'

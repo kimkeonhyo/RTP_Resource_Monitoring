@@ -1,0 +1,12 @@
+---
+# 고객사 사이트 전용. 사내용(install-zabbix-agent.yml)과 의도적으로 분리했다.
+# 고객사 장비는 동의 범위 안에서만 건드려야 하므로 --limit 으로 사이트를 지정해 실행하는 것을 권한다.
+#
+#   ansible-playbook playbooks/install-zabbix-agent-remote.yml --limit site-b --ask-vault-pass
+- name: Install Zabbix agent (remote customer sites)
+  hosts: remote_site
+  become: true
+  serial: 1                     # 한 사이트씩. 문제가 생기면 그 사이트에서 멈춘다
+  max_fail_percentage: 0
+  roles:
+    - zabbix-agent

@@ -1,0 +1,6 @@
+---
+- name: Install Zabbix Agent2
+  hosts: ims
+  become: true
+  roles:
+    - zabbix-agent

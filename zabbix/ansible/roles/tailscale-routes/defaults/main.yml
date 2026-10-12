@@ -1,0 +1,17 @@
+---
+# 기본은 점검만. 고치려면 -e tailscale_fix=true 를 준다.
+tailscale_fix: false
+
+# 이 대역 안에 있는 호스트는 이 대역 경로를 테일넷에서 받으면 안 된다.
+# dev-gpu01(<SUBNET_ROUTER_NODE>)이 광고하는 값과 같아야 한다.
+tailscale_lan_cidr: "<OFFICE_SUBNET_CIDR>"
+
+# tailscale 이 자기 경로를 넣는 라우팅 테이블. 리눅스 클라이언트 고정값이다.
+tailscale_table: 52
+
+# 자기가 사내망을 광고하는 서브넷 라우터는 제외한다.
+# 자기 광고 경로는 스스로 받지 않아 증상이 없고(table 52 에 <OFFICE_SUBNET_CIDR> 없음),
+# accept-routes 를 끄면 tsr 이 광고하는 <GCP_VPC_CIDR>(GCP) 등 다른 경로까지 잃는다.
+# 게다가 모든 관제 트래픽이 이 장비를 지나므로 라우팅 변경 위험이 가장 크다.
+tailscale_skip_hosts:
+  - dev-gpu01        # <SUBNET_ROUTER_NODE>, <OFFICE_SUBNET_CIDR> 광고

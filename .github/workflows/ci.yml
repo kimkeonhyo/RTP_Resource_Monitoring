@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+    paths: ["rtpulse/**", ".github/workflows/ci.yml"]
+  pull_request:
+    branches: ["**"]
+
+defaults:
+  run:
+    working-directory: rtpulse
+
+jobs:
+  check:
+    name: Check & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            rtpulse/target
+          key: ubuntu-cargo-${{ hashFiles('rtpulse/Cargo.lock') }}
+          restore-keys: ubuntu-cargo-
+
+      - name: cargo fmt --check
+        run: cargo fmt --check
+
+      - name: cargo clippy
+        run: cargo clippy -- -D warnings
+
+      - name: cargo test
+        run: cargo test
+
+      - name: cargo build (release)
+        run: cargo build --release

@@ -1,0 +1,20 @@
+---
+# 사내망 안에 있으면서 tailscale 이 깔린 호스트의 --accept-routes 를 점검한다.
+#
+# 켜져 있으면 dev-gpu01 이 광고하는 <OFFICE_SUBNET_CIDR> 이 라우팅 테이블 52 에 들어가
+# 사내망 응답이 tailscale0 으로 새어나간다. 서버는 멀쩡한데 밖에서만 안 닿는다.
+# 2026-09-07 ai-gpu04, 2026-09-08 ws-02 가 이 원인으로 장애가 났다.
+#
+# 점검만:
+#   ansible-playbook playbooks/check-tailscale-routes.yml --ask-vault-pass
+# 고치기:
+#   ansible-playbook playbooks/check-tailscale-routes.yml -e tailscale_fix=true --ask-vault-pass
+# 한 대만:
+#   ansible-playbook playbooks/check-tailscale-routes.yml --limit ws-02 -e tailscale_fix=true --ask-vault-pass
+
+- name: Tailscale accept-routes 점검
+  hosts: ims:!remote_site
+  gather_facts: true
+  become: true
+  roles:
+    - tailscale-routes

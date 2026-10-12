@@ -1,0 +1,31 @@
+streams:
+  - url: rtsp://<CAMERA_1_IP>:554/live/main
+    name: Office Cam 1
+  - url: rtsp://<CAMERA_2_IP>:554/live/main
+    name: Office Cam 2
+  - url: rtp://239.1.1.1:5004
+    name: Multicast Feed A
+  - url: rtsp://admin:pass@camera-03.local:554/h264/ch1
+    name: Warehouse PTZ
+  - url: rtp://239.1.1.2:5006
+    name: Multicast Feed B
+
+alerts:
+  enabled: true
+  rules:
+    loss_warn: 2.0
+    loss_crit: 10.0
+    jitter_warn: 50.0
+    jitter_crit: 100.0
+    min_bitrate: 10.0
+    min_fps: 15.0
+    cooldown_secs: 60
+  webhooks:
+    - url: https://your-server.com/api/stream-alerts
+      headers:
+        Authorization: Bearer your-token-here
+      min_severity: warning
+  slack:
+    - webhook_url: https://hooks.slack.com/services/T00/B00/xxxxx
+      channel: "#stream-alerts"
+      username: rtpulse

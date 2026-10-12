@@ -1,0 +1,272 @@
+---
+# 서버 안에서 메인보드 내부 통로(KCS)로 BMC를 설정하므로 BMC 비밀번호를 몰라도 된다.
+# 보드마다 LAN 채널 번호와 빈 슬롯이 달라 고정값을 쓸 수 없다 — 매 실행 시 탐색한다.
+
+- name: bmc_password 전달 여부 확인
+  ansible.builtin.assert:
+    that: bmc_password is defined and bmc_password | length > 0
+    fail_msg: >-
+      bmc_password 가 없습니다. Vault 에 추가하세요:
+      ansible-vault edit inventory/ims/group_vars/all/vault.yml → bmc_password: "..."
+  when: not (bmc_report_only | bool)
+
+# 무관한 서드파티 저장소(k8s·Chrome·Helm)가 깨진 서버가 있어 갱신 실패는 넘긴다.
+- name: 컨트롤러에 ipmitool 이 있는지 확인
+  ansible.builtin.command:
+    argv: [which, ipmitool]
+  delegate_to: localhost
+  become: false
+  run_once: true
+  register: bmc_ctl_ipmitool
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: 검증 생략 안내
+  ansible.builtin.debug:
+    msg: >-
+      컨트롤러에 ipmitool 이 없어 LAN 접속 검증을 건너뜁니다 (brew install ipmitool).
+      계정 생성 자체는 정상 진행됩니다.
+  run_once: true
+  when: bmc_ctl_ipmitool.rc != 0
+
+- name: apt 인덱스 갱신
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+  failed_when: false
+
+- name: ipmitool 설치
+  ansible.builtin.apt:
+    name: ipmitool
+    state: present
+    install_recommends: false    # freeipmi 등 권장 패키지 제외 (404 회피)
+
+# community.general 컬렉션에 의존하지 않도록 modprobe 를 직접 호출한다.
+# 커널에 빌트인이거나 이미 적재돼 있으면 실패해도 무방하다.
+- name: IPMI 커널 모듈 적재
+  ansible.builtin.command: "modprobe {{ item }}"
+  loop: [ipmi_devintf, ipmi_si]
+  register: modprobe_out
+  changed_when: false
+  failed_when: false
+
+# 보드마다 채널 구성이 다르다: 8번만 / 1번만 / 둘 다 / 없음.
+# 게다가 쓰지 않는 채널에 제조사 기본 IP(<VENDOR_DEFAULT_BMC_IP> 등)가 남아 있어,
+# "IP가 있는 첫 채널"을 고르면 엉뚱한 채널을 잡는다.
+# → 전체 채널을 모아 관리망 대역({{ bmc_mgmt_prefix }})을 우선 선택한다.
+- name: BMC LAN 채널 전체 조회
+  ansible.builtin.shell: |
+    set -o pipefail
+    for c in $(seq 1 15); do
+      ip=$(ipmitool lan print "$c" 2>/dev/null | awk -F': +' '/^IP Address  /{print $2}')
+      [ -n "$ip" ] && [ "$ip" != "0.0.0.0" ] && echo "$c $ip"
+    done
+    exit 0
+  args:
+    executable: /bin/bash
+  register: bmc_scan
+  changed_when: false
+  failed_when: false
+  check_mode: false          # 조회만 하므로 --check 에서도 실행
+
+- name: 발견된 채널 목록
+  ansible.builtin.debug:
+    msg: "{{ inventory_hostname }} — 채널 {{ bmc_scan.stdout_lines | default([]) | join(' / ') or '없음' }}"
+
+- name: 관리망 채널 우선 선택
+  ansible.builtin.set_fact:
+    bmc_lan_pick: >-
+      {{ (bmc_scan.stdout_lines | default([]) | select('search', ' ' ~ bmc_mgmt_prefix) | list
+          or bmc_scan.stdout_lines | default([])) | first | default('') }}
+
+- name: BMC LAN 미설정 서버는 건너뛴다
+  when: bmc_lan_pick | length == 0
+  block:
+    - name: 사유 출력
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }} — BMC LAN 없음 (케이블 미연결 또는 IP 미설정). 건너뜁니다."
+    - name: 이 호스트 종료
+      ansible.builtin.meta: end_host
+
+- name: 채널·IP 변수화
+  ansible.builtin.set_fact:
+    bmc_channel: "{{ bmc_lan_pick.split()[0] }}"
+    bmc_ip: "{{ bmc_lan_pick.split()[1] }}"
+    bmc_priv_name: "{{ {'1':'CALLBACK','2':'USER','3':'OPERATOR','4':'ADMINISTRATOR'}[bmc_privilege | string] }}"
+
+# 이름 없는 슬롯은 컬럼이 밀려 $2가 true/false 로 온다. 그걸로 빈 슬롯을 판별한다.
+- name: 기존 계정 또는 빈 슬롯 확인
+  ansible.builtin.shell: |
+    set -o pipefail
+    ch="{{ bmc_channel }}"
+    cur=$(ipmitool user list "$ch" | awk -v u="{{ bmc_user }}" 'NR>1 && $2==u {print $1; exit}')
+    if [ -n "$cur" ]; then echo "$cur exist"; exit 0; fi
+    free=$(ipmitool user list "$ch" | awk 'NR>1 && $1>=3 && ($2=="true"||$2=="false") {print $1; exit}')
+    if [ -n "$free" ]; then echo "$free free"; exit 0; fi
+    exit 2
+  args:
+    executable: /bin/bash
+  register: bmc_slot
+  changed_when: false
+  failed_when: bmc_slot.rc == 2
+  check_mode: false          # 조회만 하므로 --check 에서도 실행
+
+- name: 슬롯 변수화
+  ansible.builtin.set_fact:
+    bmc_id: "{{ bmc_slot.stdout.split()[0] }}"
+    bmc_slot_state: "{{ bmc_slot.stdout.split()[1] }}"
+
+# 채널 1에 제조사 기본값(<VENDOR_DEFAULT_BMC_IP>)만 있는 보드가 여럿이다.
+# 그런 채널에 계정을 만들어도 원격에서 못 쓰고, 공유 LAN 접근 설정을 건드릴 수 있어 건너뛴다.
+- name: 관리망 밖 BMC 는 건너뛴다
+  when:
+    - not (bmc_allow_nonmgmt | bool)
+    - not bmc_ip.startswith(bmc_mgmt_prefix)
+  block:
+    - name: 사유 출력
+      ansible.builtin.debug:
+        msg: >-
+          {{ inventory_hostname }} — BMC {{ bmc_ip }} (채널 {{ bmc_channel }}) 는 관리망({{ bmc_mgmt_prefix }}) 밖입니다.
+          BMC 네트워크 설정을 먼저 정리해야 합니다. 강제 진행은 -e bmc_allow_nonmgmt=true
+    - name: 이 호스트 종료
+      ansible.builtin.meta: end_host
+
+- name: 현황
+  ansible.builtin.debug:
+    msg: >-
+      {{ inventory_hostname }} — BMC {{ bmc_ip }} (채널 {{ bmc_channel }}) /
+      '{{ bmc_user }}' {{ '이미 있음 (ID ' + bmc_id + ')' if bmc_slot_state == 'exist'
+                          else '신규 생성 (ID ' + bmc_id + ')' }}
+
+- name: 조회만 하고 종료
+  ansible.builtin.meta: end_host
+  when: bmc_report_only | bool
+
+# 이미 쓸 수 있는 계정의 비밀번호를 매번 새로 설정할 이유가 없다.
+# MegaRAC 은 짧은 간격의 비밀번호 재변경을 거부하기도 해서, 재실행이 오히려 계정을 망가뜨린다.
+- name: 기존 계정으로 이미 접속되는지 확인 (컨트롤러 → BMC)
+  ansible.builtin.command:
+    argv: [ipmitool, -I, lanplus, -L, "{{ bmc_priv_name }}",
+           -H, "{{ bmc_ip }}", -U, "{{ bmc_user }}", -P, "{{ bmc_password }}",
+           sdr, list]
+  delegate_to: localhost
+  become: false
+  register: bmc_pre
+  changed_when: false
+  failed_when: false
+  no_log: true
+  when:
+    - bmc_slot_state == 'exist'
+    - bmc_ctl_ipmitool.rc == 0
+
+- name: 이미 정상이면 손대지 않는다
+  when: bmc_pre.rc | default(1) == 0
+  block:
+    - name: 결과
+      ansible.builtin.debug:
+        msg: >-
+          {{ inventory_hostname }} — BMC {{ bmc_ip }} 채널 {{ bmc_channel }} /
+          '{{ bmc_user }}' (ID {{ bmc_id }}) 이미 정상 동작 — 변경 없음
+          (센서 {{ bmc_pre.stdout_lines | default([]) | length }}개)
+    - name: 이 호스트 종료
+      ansible.builtin.meta: end_host
+
+- name: 계정 이름 설정
+  ansible.builtin.command:
+    argv: [ipmitool, user, set, name, "{{ bmc_id }}", "{{ bmc_user }}"]
+  when: bmc_slot_state == 'free'
+
+- name: 비밀번호 설정
+  ansible.builtin.command:
+    argv: [ipmitool, user, set, password, "{{ bmc_id }}", "{{ bmc_password }}"]
+  register: bmc_pw
+  no_log: true                   # 로그에 비밀번호를 남기지 않는다
+  changed_when: bmc_pw.rc == 0
+  failed_when: false
+
+# 일부 BMC 는 16바이트 형식을 거부하고 IPMI 2.0 의 20바이트 형식만 받는다.
+- name: 비밀번호 설정 재시도 (20바이트 형식)
+  ansible.builtin.command:
+    argv: [ipmitool, user, set, password, "{{ bmc_id }}", "{{ bmc_password }}", "20"]
+  register: bmc_pw20
+  no_log: true
+  changed_when: bmc_pw20.rc == 0
+  failed_when: false
+  when: bmc_pw.rc != 0
+
+# no_log 로 가려진 에러를 비밀번호만 지운 채 드러낸다 — 원인을 못 보면 고칠 수가 없다.
+# 실패하더라도 계정을 못 쓰는 상태로 남기지 않는다.
+- name: 실패 시 계정 원상 복구
+  ansible.builtin.command:
+    argv: [ipmitool, user, enable, "{{ bmc_id }}"]
+  changed_when: false
+  failed_when: false
+  when:
+    - bmc_pw.rc != 0
+    - bmc_pw20.rc | default(1) != 0
+
+- name: 비밀번호 설정 실패
+  ansible.builtin.fail:
+    msg: >-
+      {{ inventory_hostname }} — BMC 비밀번호를 설정하지 못했습니다.
+      16바이트: {{ (bmc_pw.stderr ~ ' ' ~ bmc_pw.stdout) | replace(bmc_password, '***') | trim }} /
+      20바이트: {{ (bmc_pw20.stderr ~ ' ' ~ bmc_pw20.stdout) | replace(bmc_password, '***') | trim }}
+  when:
+    - bmc_pw.rc != 0
+    - bmc_pw20.rc | default(1) != 0
+
+- name: 권한 부여 (USER = 센서 읽기 전용)
+  ansible.builtin.command: "ipmitool user priv {{ bmc_id }} {{ bmc_privilege }} {{ bmc_channel }}"
+
+- name: 계정 활성화
+  ansible.builtin.command: "ipmitool user enable {{ bmc_id }}"
+
+- name: LAN 채널 접근 허용
+  ansible.builtin.command: >-
+    ipmitool channel setaccess {{ bmc_channel }} {{ bmc_id }}
+    link=on ipmi=on callin=on privilege={{ bmc_privilege }}
+
+- name: 반영 확인
+  ansible.builtin.shell: |
+    set -o pipefail
+    ipmitool user list {{ bmc_channel }} | awk -v u="{{ bmc_user }}" 'NR>1 && $2==u'
+  args:
+    executable: /bin/bash
+  register: bmc_verify
+  changed_when: false
+  check_mode: false          # 조회만 하므로 --check 에서도 실행
+
+# 계정이 목록에 보이는 것과 실제로 LAN 으로 붙는 것은 다르다.
+#
+# 검증은 반드시 컨트롤러(= Zabbix 가 도는 곳)에서 한다. 서버가 자기 자신의 BMC IP 로
+# 붙는 경로는 실제로 막혀 있고(RMCP+ 세션 거부), Zabbix 가 쓰는 경로도 아니다.
+# -L 없이 실행하면 ipmitool 이 ADMINISTRATOR 를 요구해 USER 계정으로는 실패한다.
+- name: LAN 접속 실제 검증 (컨트롤러 → BMC)
+  ansible.builtin.command:
+    argv: [ipmitool, -I, lanplus, -L, "{{ bmc_priv_name }}",
+           -H, "{{ bmc_ip }}", -U, "{{ bmc_user }}", -P, "{{ bmc_password }}",
+           sdr, list]
+  delegate_to: localhost
+  become: false
+  register: bmc_lan_test
+  changed_when: false
+  failed_when: false
+  no_log: true
+  when: bmc_ctl_ipmitool.rc == 0
+
+- name: 결과
+  ansible.builtin.debug:
+    msg: >-
+      {{ inventory_hostname }} — BMC {{ bmc_ip }} 채널 {{ bmc_channel }} /
+      계정: {{ bmc_verify.stdout | trim }} /
+      LAN 접속: {{ '검증 생략' if bmc_lan_test.rc is not defined
+                   else ('성공 (센서 ' ~ (bmc_lan_test.stdout_lines | default([]) | length) ~ '개)' if bmc_lan_test.rc == 0
+                   else '실패 — ' ~ (bmc_lan_test.stderr | default('') | truncate(60))) }}
+
+- name: LAN 접속 실패 시 중단 (카나리에서 걸러낸다)
+  ansible.builtin.fail:
+    msg: >-
+      {{ inventory_hostname }} — 계정은 만들어졌지만 LAN 으로 접속되지 않습니다.
+      BMC 의 IPMI over LAN 설정이나 비밀번호 정책을 확인하세요.
+  when: bmc_lan_test.rc | default(0) != 0

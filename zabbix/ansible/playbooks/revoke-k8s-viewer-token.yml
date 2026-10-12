@@ -1,0 +1,89 @@
+---
+# 고객사 사이트 k8s 의 vms-viewer 장기 토큰(kube-system/vms-viewer-token Secret)을 폐기한다.
+#
+# 이 Secret 이 무만료 레거시 SA 토큰이고, 그 토큰이 VMS-Product-dev-manifest 의
+# vms/k8s/out/viewer-*.yml 로 커밋돼 있었다 (SYSINF-220). 매니페스트에서 Secret 을 빼도
+# kubectl apply 는 기존 리소스를 지우지 않으므로 사이트마다 직접 지워야 토큰이 무효화된다.
+# SA·ClusterRoleBinding 은 남긴다 — 단기 토큰(`just gen-viewer`) 발급에 쓴다.
+#
+# 기본은 점검만(무엇을 지울지 출력). 지우려면 -e revoke=true.
+#   ansible-playbook playbooks/revoke-k8s-viewer-token.yml --ask-vault-pass
+#   ansible-playbook playbooks/revoke-k8s-viewer-token.yml --ask-vault-pass -e revoke=true --limit site-e
+#   ansible-playbook playbooks/revoke-k8s-viewer-token.yml --ask-vault-pass -e revoke=true
+#
+# 한 사이트씩 진행하고(serial: 1), 실패하면 나머지 사이트는 건드리지 않고 멈춘다.
+# 지운 뒤에는 지우기 직전의 토큰으로 API 를 다시 호출해 401 인지 확인한다.
+# 토큰 값은 원격 호스트의 셸 변수 안에서만 다루고 출력·로그로 내보내지 않는다.
+#
+# 되돌리기: 이 토큰은 되살릴 수 없다(새로 만들면 다른 값). 필요하면 단기 토큰을 쓴다.
+#
+# sudo 는 쓰지 않는다 — 접속 계정(ops)의 ~/.kube/config(admin)로 실행한다.
+
+- name: vms-viewer 장기 토큰 폐기
+  hosts: remote_site
+  gather_facts: false
+  become: false
+  serial: 1
+  any_errors_fatal: true
+  vars:
+    revoke: false
+  tasks:
+    - name: 상태 확인
+      ansible.builtin.shell:
+        executable: /bin/bash
+        cmd: |
+          export PATH="$PATH:/usr/local/bin:/snap/bin"
+          kubectl version --request-timeout=5s >/dev/null 2>&1 || { echo "kubectl=no"; exit 0; }
+          echo "kubectl=yes"
+          kubectl -n kube-system get secret vms-viewer-token >/dev/null 2>&1 && echo "secret=yes" || echo "secret=no"
+      register: st
+      changed_when: false
+
+    - name: 정리
+      ansible.builtin.set_fact:
+        vt: "{{ dict(st.stdout_lines | select('search', '=') | map('split', '=', 1)) }}"
+
+    - name: 대상 아님
+      ansible.builtin.debug:
+        msg: >-
+          {{ inventory_hostname }}:
+          {{ 'kubectl 사용 불가 — 수동 확인' if vt.kubectl != 'yes' else '토큰 Secret 없음 — 할 일 없음' }}
+      when: vt.kubectl != 'yes' or vt.secret != 'yes'
+
+    - name: 점검 모드 결과
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }}: kube-system/vms-viewer-token 있음 — -e revoke=true 로 폐기"
+      when: vt.kubectl == 'yes' and vt.secret == 'yes' and not (revoke | bool)
+
+    - name: 폐기 후 이전 토큰으로 검증
+      ansible.builtin.shell:
+        executable: /bin/bash
+        cmd: |
+          set -euo pipefail
+          export PATH="$PATH:/usr/local/bin:/snap/bin"
+          SERVER=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+          OLD=$(kubectl -n kube-system get secret vms-viewer-token -o jsonpath='{.data.token}' | base64 -d)
+          kubectl -n kube-system delete secret vms-viewer-token --wait=true >/dev/null
+          echo "deleted=yes"
+          # 토큰 무효화는 Secret 삭제 직후 반영되지만 apiserver 캐시를 감안해 몇 번 재시도한다
+          for i in 1 2 3 4 5 6; do
+            # 헤더를 stdin 으로 넘겨 토큰이 프로세스 인자(ps)에 보이지 않게 한다
+            code=$(printf 'Authorization: Bearer %s\n' "$OLD" \
+              | curl -sk -o /dev/null -w '%{http_code}' -H @- "$SERVER/api" || echo 000)
+            [ "$code" = 401 ] && break
+            sleep 5
+          done
+          unset OLD
+          echo "old_token_http=$code"
+      register: rv
+      changed_when: "'deleted=yes' in rv.stdout"
+      when: vt.kubectl == 'yes' and vt.secret == 'yes' and (revoke | bool)
+
+    - name: 무효화 확인
+      ansible.builtin.assert:
+        that: "'old_token_http=401' in rv.stdout"
+        success_msg: "{{ inventory_hostname }}: 폐기 완료 — 이전 토큰 401"
+        fail_msg: >-
+          {{ inventory_hostname }}: Secret 은 지웠지만 이전 토큰이 401 이 아니다
+          ({{ rv.stdout_lines | select('match', '^old_token_http=') | list }}) — 수동 확인 후 진행
+      when: rv is not skipped and rv is defined and rv.stdout is defined

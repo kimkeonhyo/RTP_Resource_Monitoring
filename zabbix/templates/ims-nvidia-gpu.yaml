@@ -1,0 +1,80 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    - uuid: fa8a76eb9bfa45c585588522ae746fde
+      template: 'IMS NVIDIA GPU by Zabbix agent'
+      name: 'IMS NVIDIA GPU by Zabbix agent'
+      groups:
+        - name: Templates/Applications
+      discovery_rules:
+        - uuid: bc85907d21a54818b2f31cc30a48f7c0
+          name: 'GPU 발견'
+          key: gpu.discovery
+          delay: 1h
+          description: 'nvidia-smi 로 GPU 목록을 읽어 장착 수만큼 아이템을 자동 생성한다.'
+          item_prototypes:
+            - uuid: 4814a9fc0b5e4d519d468f84def3c7f4
+              name: 'GPU {#GPUID} ({#GPUNAME}): VRAM 전체'
+              key: 'gpu.mem.total[{#GPUID}]'
+              delay: 5m
+              value_type: FLOAT
+              units: B
+              preprocessing:
+                - type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+            - uuid: 6373ca7686c84b28adfcbde067a49ecd
+              name: 'GPU {#GPUID} ({#GPUNAME}): VRAM 사용'
+              key: 'gpu.mem.used[{#GPUID}]'
+              value_type: FLOAT
+              units: B
+              preprocessing:
+                - type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+            - uuid: 1864854342e947c2a3e5e5e418b2c796
+              name: 'GPU {#GPUID} ({#GPUNAME}): VRAM 사용률'
+              type: CALCULATED
+              key: 'gpu.mem.util[{#GPUID}]'
+              value_type: FLOAT
+              units: '%'
+              params: '100*last(//gpu.mem.used[{#GPUID}])/last(//gpu.mem.total[{#GPUID}])'
+              trigger_prototypes:
+                - uuid: 611188eacf514afea21a2042c1c86538
+                  expression: 'min(/IMS NVIDIA GPU by Zabbix agent/gpu.mem.util[{#GPUID}],10m)>{$GPU.VRAM.WARN}'
+                  name: 'GPU {#GPUID}: VRAM 부족 (>{$GPU.VRAM.WARN}%)'
+                  priority: WARNING
+            - uuid: 70295cd19c5d42c98c31c03f54af84ff
+              name: 'GPU {#GPUID} ({#GPUNAME}): 소비전력'
+              key: 'gpu.power[{#GPUID}]'
+              value_type: FLOAT
+              units: W
+            - uuid: adc31e1e2b41477bb10cc7f4ef76d5dc
+              name: 'GPU {#GPUID} ({#GPUNAME}): 온도'
+              key: 'gpu.temp[{#GPUID}]'
+              value_type: FLOAT
+              units: °C
+              trigger_prototypes:
+                - uuid: 1ee52f23d53c4526abbdd8ad3e8cf397
+                  expression: 'min(/IMS NVIDIA GPU by Zabbix agent/gpu.temp[{#GPUID}],5m)>{$GPU.TEMP.WARN}'
+                  name: 'GPU {#GPUID}: 온도 높음 (>{$GPU.TEMP.WARN}°C)'
+                  priority: WARNING
+                - uuid: f3e73d0908e84231ad56e81cc425e773
+                  expression: 'min(/IMS NVIDIA GPU by Zabbix agent/gpu.temp[{#GPUID}],3m)>{$GPU.TEMP.CRIT}'
+                  name: 'GPU {#GPUID}: 온도 심각 (>{$GPU.TEMP.CRIT}°C)'
+                  priority: HIGH
+            - uuid: d2a43a07e9c94ef785979a3dbceb4230
+              name: 'GPU {#GPUID} ({#GPUNAME}): 사용률'
+              key: 'gpu.util[{#GPUID}]'
+              value_type: FLOAT
+              units: '%'
+      macros:
+        - macro: '{$GPU.TEMP.CRIT}'
+          value: '88'
+        - macro: '{$GPU.TEMP.WARN}'
+          value: '80'
+        - macro: '{$GPU.VRAM.WARN}'
+          value: '95'

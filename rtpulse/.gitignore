@@ -1,0 +1,23 @@
+# Build artifacts
+/target/
+/rtpulse
+
+# Installers
+*.pkg
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Local app data
+*.sqlite3

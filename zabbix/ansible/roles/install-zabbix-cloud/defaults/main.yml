@@ -1,0 +1,32 @@
+---
+# GCP VM 용 Zabbix Agent2. 사내용 zabbix-agent 롤과 갈라 둔 이유:
+#   · 사내는 apt·ufw·GPU/NPU UserParameter, 클라우드는 dnf·firewalld·SELinux 다
+#   · 사내는 dev-gpu01 SNAT 때문에 Server= 가 두 개, 클라우드는 같은 VPC 라 하나다
+# 공통 부분(설정 주입·검증)은 겹치지만, 한 롤에 when 을 깔아 두는 것보다 읽기 쉽다.
+
+zabbix_server: "<ZABBIX_SERVER_IP>"          # demo-infra-o11y-zabbix
+
+# Server= (누가 이 에이전트에 질의할 수 있는가).
+# GCP VM 은 Zabbix 서버와 같은 VPC(<GCP_VPC_CIDR>) 라 SNAT 를 거치지 않는다.
+# 사내망처럼 서브넷 라우터 주소를 더할 필요가 없다.
+zabbix_cloud_server_allow: "{{ zabbix_server }}"
+
+# 자동 등록 액션이 이 값으로 템플릿·호스트그룹을 고른다.
+# 사내(linux;ims)·고객사(linux;remote)와 구분해 GCP 만 따로 묶는다.
+# ⚠ Zabbix 에 이 조건을 가진 자동 등록 액션이 없으면 호스트가 등록되지 않는다.
+zabbix_host_metadata: "linux;gcp"
+
+# Zabbix 에 등록될 이름. GCP VM 이름에는 재생성 때 바뀌는 난수 접미사가 붙으므로
+# (demo-infra-platform-rtpulse-xxxx) 인벤토리 별칭을 쓴다.
+zabbix_hostname: "{{ inventory_hostname }}"
+
+# 사내는 mblt-status 같은 무거운 UserParameter 때문에 30초가 필요하지만
+# 클라우드 VM 에는 없다. 길게 두면 멈춘 아이템이 폴러를 그만큼 붙잡는다.
+zabbix_agent_timeout: 10
+
+zabbix_major: "7.0"
+# rhel/ 경로 하나로 Rocky·AlmaLinux·RHEL 8/9/10 을 모두 덮는다 (rocky/ 도 있지만 동일).
+zabbix_release_url_rpm: >-
+  https://repo.zabbix.com/zabbix/{{ zabbix_major }}/rhel/{{ ansible_distribution_major_version }}/x86_64/zabbix-release-latest-{{ zabbix_major }}.el{{ ansible_distribution_major_version }}.noarch.rpm
+zabbix_release_url_deb: >-
+  https://repo.zabbix.com/zabbix/{{ zabbix_major }}/ubuntu/pool/main/z/zabbix-release/zabbix-release_{{ zabbix_major }}-2+ubuntu{{ ansible_distribution_version }}_all.deb

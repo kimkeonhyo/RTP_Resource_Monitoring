@@ -1,0 +1,61 @@
+---
+# vault.yml 의 구조 예시입니다. 이 파일 자체는 암호화하지 않으며 값도 들어 있지 않습니다.
+#
+# 실제 vault.yml 은 .gitignore 로 커밋을 막아 두었습니다. 새로 합류하셨다면
+# 레포에서 받는 것이 아니라 인프라 담당자에게 파일을 받아 같은 디렉터리에 두세요.
+# 받는 방법과 Vault 비밀번호 위치는 ../../../../SECRETS.md 에 있습니다.
+#
+# 직접 만들어야 한다면:
+#   ansible-vault create inventory/ims/group_vars/all/vault.yml
+#   (편집기가 열리면 아래 형식으로 채웁니다 — 이 파일을 복사해 넣으면 됩니다)
+#
+# 수정:
+#   ansible-vault edit inventory/ims/group_vars/all/vault.yml
+
+# ── 서버별 sudo 비밀번호 ────────────────────────────────────────────────
+# group_vars/all/main.yml 이 이렇게 꺼내 씁니다:
+#   ansible_become_password: "{{ become_passwords[inventory_hostname] | mandatory }}"
+#
+# mandatory 라서 **hosts.ini 의 모든 호스트가 여기 있어야** 합니다. 빠지면
+# 어느 호스트가 없는지 이름을 찍으며 멈춥니다(조용히 틀린 비밀번호를 보내지 않음).
+#
+# sudo 가 NOPASSWD 인 호스트는 빈 문자열로 둡니다 — 키가 있어야 mandatory 를 통과합니다.
+become_passwords:
+  ai-gpu01: "비밀번호"
+  ai-gpu02: "비밀번호"
+  ai-gpu04: "비밀번호"
+  dev-gpu01: "비밀번호"
+  dev-gpu02: "비밀번호"
+  dev-gpu03: "비밀번호"
+  dev-gpu04: "비밀번호"
+  dev-media01: "비밀번호"
+  dev-storage01: "비밀번호"
+  inf-gpu01: "비밀번호"
+  inf-gpu02: "비밀번호"
+  esc8000: "비밀번호"
+  h200: "비밀번호"
+  GPU-server-741GE-TNRT: ""        # sudo NOPASSWD — 빈 값으로 둔다
+  nas01: "비밀번호"
+  nas02: "비밀번호"
+  nas03: "비밀번호"
+  ws-04: "비밀번호"
+  ws-01: "비밀번호"
+  ws-03: "비밀번호"
+  ws-05: "비밀번호"
+  ws-07: "비밀번호"
+  ws-06: "비밀번호"
+  ws-02: "비밀번호"
+  site-a: "비밀번호"
+  site-b: "비밀번호"
+  site-c: "비밀번호"
+  site-d: "비밀번호"
+  site-f: "비밀번호"
+  site-e: "비밀번호"
+
+# ── BMC 관제 계정 비밀번호 ──────────────────────────────────────────────
+# roles/bmc-user 와 playbooks/bmc-network-set.yml 이 씁니다. 전 BMC 공통 값입니다.
+# 없으면 롤이 "bmc_password 가 없습니다" 로 멈춥니다.
+#
+# IPMI 2.0 은 20바이트까지 받지만 16바이트만 받는 BMC 가 섞여 있어, 롤이 16바이트로
+# 먼저 시도하고 실패하면 20바이트로 재시도합니다.
+bmc_password: "비밀번호"
